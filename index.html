@@ -23,34 +23,21 @@
         .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .dashboard-card { height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s ease; z-index: 20; }
         
-        /* Fixed Search Bar Transparency */
         #mainSearch { 
-            outline: none !important; 
-            box-shadow: none !important; 
-            border: none !important; 
-            background: transparent !important; 
-            color: white !important;
-            appearance: none !important;
-            -webkit-appearance: none !important;
+            outline: none !important; box-shadow: none !important; border: none !important; 
+            background: transparent !important; color: white !important;
+            appearance: none !important; -webkit-appearance: none !important;
         }
 
-        /* Footer Help - Centered Hover Logic */
         .help-content { 
-            opacity: 0; 
-            visibility: hidden; 
-            transform: translateY(10px); 
-            transition: all 0.3s ease; 
-            pointer-events: none;
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%) translateY(10px);
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; pointer-events: none;
+            position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%) translateY(10px);
         }
         .help-trigger:hover .help-content { 
-            opacity: 1; 
-            visibility: visible; 
-            transform: translateX(-50%) translateY(-10px); 
+            opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-10px); 
         }
+
+        .brand-icon { width: 32px; height: 32px; object-fit: contain; margin-bottom: 8px; }
 
         .modal-fixed-height { height: 500px; display: flex; flex-direction: column; }
     </style>
@@ -61,7 +48,8 @@
         const TITLE_HEADERS = ["Taran's Terminal", "Taran's Transit", "Kiki's Kiosk", "Kiki's Kingdom", "Taran's Portal"];
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_URL = 'http://plex.tarankurtz.com:32400'; 
-        const NAS_PHYSICAL_IP = 'http://192.168.1.69:8000'; 
+        const NAS_IP = 'http://192.168.1.69'; // For Status Check
+        const NAS_SETTINGS_URL = 'http://107.220.202.150:8000/';
         const HFS_URL = 'https://transfer.tarankurtz.com:8443'; 
         const ADMIN_PASS = 'Potatoes2!'; 
     </script>
@@ -75,17 +63,14 @@
 
     <div class="w-full max-w-2xl mb-12">
         <div class="flex items-center bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded-full px-2 py-2 shadow-xl focus-within:border-zinc-700 transition-all">
-            <input type="text" id="mainSearch" 
-                   onkeydown="if(event.key==='Enter') doSearch('google')" 
-                   placeholder="Search or ask AI..." 
-                   class="flex-1 py-2 px-6 text-base text-white">
+            <input type="text" id="mainSearch" onkeydown="if(event.key==='Enter') doSearch('google')" placeholder="Search or ask AI..." class="flex-1 py-2 px-6 text-base text-white">
             <button onclick="doSearch('ai')" class="p-2.5 bg-blue-600 hover:bg-blue-500 rounded-full text-white mr-1 transition-transform active:scale-95">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </button>
         </div>
     </div>
 
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 w-full max-w-6xl mb-12">
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl mb-12">
         
         <div onclick="window.location.href=HFS_URL" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-blue-500">
             <div id="hfsStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-500 italic">Checking...</div>
@@ -96,19 +81,24 @@
 
         <div onclick="window.open(PLEX_URL, '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-orange-500">
             <div id="plexStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-500 italic">Checking...</div>
-            <div class="text-2xl mb-1">🎬</div>
+            <img src="https://www.plex.tv/wp-content/uploads/2022/01/plex-icon-symbol-1.png" class="brand-icon" alt="Plex">
             <div class="text-[11px] uppercase tracking-widest font-bold">Plex</div>
             <span onclick="event.stopPropagation(); requestPlexAccess();" class="absolute bottom-2 text-[8px] text-zinc-500 underline uppercase hover:text-orange-400 z-50">Request Access</span>
         </div>
 
         <div onclick="window.open('https://youtube.com', '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-red-600">
-            <div class="text-2xl mb-1">📺</div>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png" class="brand-icon" style="width: 40px;" alt="YouTube">
             <div class="text-[11px] uppercase tracking-widest font-bold">YouTube</div>
         </div>
 
         <div onclick="window.open('https://remotedesktop.google.com/access', '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-blue-400">
-            <div class="text-2xl mb-1">🖥️</div>
+            <img src="https://fonts.gstatic.com/s/i/productlogos/chrome_remote_desktop/v7/web-96dp/logo_chrome_remote_desktop_color_96dp.png" class="brand-icon" alt="Remote">
             <div class="text-[11px] uppercase tracking-widest font-bold">Remote</div>
+        </div>
+
+        <div onclick="window.open(NAS_SETTINGS_URL, '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-zinc-400">
+            <div class="text-2xl mb-1">⚙️</div>
+            <div class="text-[11px] uppercase tracking-widest font-bold text-center px-2">NAS Settings</div>
         </div>
 
         <div onclick="toggleModal('requestModal')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-emerald-500">
@@ -173,7 +163,8 @@
 
         async function checkOnlineStatus() {
             fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('hfsStatus', true)).catch(() => setStatus('hfsStatus', false));
-            fetch(NAS_PHYSICAL_IP, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('plexStatus', true)).catch(() => setStatus('plexStatus', false));
+            // Ping NAS IP directly as requested
+            fetch(NAS_IP, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('plexStatus', true)).catch(() => setStatus('plexStatus', false));
         }
 
         function setStatus(id, online) {
