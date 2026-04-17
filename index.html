@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://cdn.tailwindcss.com"></script>.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taran's Portal</title>
     <script src="https://tailwindcss.com"></script>
+    <style>
+        .modal-hidden { display: none; }
+        .modal-visible { display: flex; }
+    </style>
 </head>
 <body class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-center p-6">
 
@@ -13,56 +16,71 @@
 
     <!-- Search Bar -->
     <div class="w-full max-w-xl mb-12">
-        <form action="https://google.com" method="get" class="relative">
+        <form action="https://google.com" method="get">
             <input type="text" name="q" placeholder="Search Google or AI..." 
                 class="w-full bg-zinc-900 border border-zinc-800 rounded-full py-4 px-6 text-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-center">
         </form>
     </div>
 
-    <!-- Quick Links Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl mb-12">
+    <!-- The Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-3xl mb-12">
         <a href="http://tarankurtz.com" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
-            <div class="text-3xl mb-2">📂</div>
+            <img src="https://icons8.com" class="mx-auto mb-3 w-10 h-10" alt="Files">
             <div class="text-sm font-medium group-hover:text-blue-400">Files</div>
         </a>
-        <a href="http://tarankurtz.com" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
-            <div class="text-3xl mb-2">🎬</div>
-            <div class="text-sm font-medium group-hover:text-blue-400">Overseerr</div>
+
+        <!-- POP-UP TRIGGER BUTTON -->
+        <button onclick="toggleModal()" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
+            <img src="https://icons8.com" class="mx-auto mb-3 w-10 h-10" alt="Requests">
+            <div class="text-sm font-medium group-hover:text-blue-400">Add Request</div>
+        </button>
+
+        <a href="https://plex.tv" target="_blank" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-yellow-500 transition-all">
+            <img src="https://simpleicons.org" class="mx-auto mb-3 w-10 h-10" alt="Plex">
+            <div class="text-sm font-medium group-hover:text-yellow-400">Plex</div>
         </a>
-        <a href="https://plex.tv" target="_blank" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
-            <div class="text-3xl mb-2">🍿</div>
-            <div class="text-sm font-medium group-hover:text-blue-400">Plex</div>
+
+        <a href="https://youtube.com" target="_blank" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-red-600 transition-all">
+            <img src="https://simpleicons.org" class="mx-auto mb-3 w-10 h-10" alt="YouTube">
+            <div class="text-sm font-medium group-hover:text-red-500">YouTube</div>
         </a>
-        <a href="https://openai.com" target="_blank" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
-            <div class="text-3xl mb-2">🤖</div>
-            <div class="text-sm font-medium group-hover:text-blue-400">AI Chat</div>
+
+        <a href="https://google.com" target="_blank" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-green-500 transition-all">
+            <img src="https://icons8.com" class="mx-auto mb-3 w-10 h-10" alt="Remote PC">
+            <div class="text-sm font-medium group-hover:text-green-400">Remote PC</div>
+        </a>
+
+        <a href="https://chatgpt.com" target="_blank" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-emerald-500 transition-all">
+            <img src="https://simpleicons.org" class="mx-auto mb-3 w-10 h-10" alt="AI Chat">
+            <div class="text-sm font-medium group-hover:text-emerald-400">AI Chat</div>
         </a>
     </div>
 
-    <!-- Simple Request Form -->
-    <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-2xl">
-        <h2 class="text-xl font-semibold mb-6 text-center text-blue-400">🎬 Media Request</h2>
-        
-        <!-- Change the action URL to your Google Form or HFS upload link if needed -->
-        <form action="#" method="POST" class="space-y-4">
-            <div>
-                <input type="text" placeholder="Your Name" required
-                    class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 focus:outline-none focus:border-blue-500">
-            </div>
-            <div>
-                <input type="text" placeholder="Movie or TV Show Name" required
-                    class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 focus:outline-none focus:border-blue-500">
-            </div>
-            <button type="submit" 
-                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-blue-900/20">
-                Submit Request
-            </button>
-        </form>
+    <!-- THE HIDDEN MODAL -->
+    <div id="requestModal" class="modal-hidden fixed inset-0 bg-black/80 items-center justify-center p-4 z-50">
+        <div class="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl w-full max-w-md relative">
+            <button onclick="toggleModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
+            <h2 class="text-xl font-semibold mb-6 text-center text-blue-400">🎬 Media Request</h2>
+            <form action="#" method="POST" class="space-y-4">
+                <input type="text" placeholder="Your Name" required class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 focus:outline-none focus:border-blue-500">
+                <input type="text" placeholder="Movie or TV Show Name" required class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 focus:outline-none focus:border-blue-500">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors">Submit Request</button>
+            </form>
+        </div>
     </div>
 
-    <footer class="mt-20 text-zinc-600 text-xs tracking-widest uppercase">
-        Private Server &copy; 2026
-    </footer>
+    <script>
+        function toggleModal() {
+            const modal = document.getElementById('requestModal');
+            if (modal.classList.contains('modal-hidden')) {
+                modal.classList.remove('modal-hidden');
+                modal.classList.add('modal-visible');
+            } else {
+                modal.classList.remove('modal-visible');
+                modal.classList.add('modal-hidden');
+            }
+        }
+    </script>
 
 </body>
 </html>
