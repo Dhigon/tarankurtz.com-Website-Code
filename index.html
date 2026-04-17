@@ -15,7 +15,6 @@
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
         
-        /* VAULTED BACKGROUND LOGIC */
         #mainBody { 
             background-image: url('https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/background-1.jpg');
             background-size: cover; background-position: center; background-attachment: fixed; background-color: #09090b;
@@ -24,7 +23,6 @@
         .status-dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block; margin-right: 5px; }
         .dashboard-card { height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; }
         
-        /* VAULTED SEARCH BAR CSS */
         #mainSearch { outline: none !important; box-shadow: none !important; border: none !important; background-color: transparent !important; color: white !important; }
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 
@@ -51,7 +49,7 @@
     </script>
 
     <div class="text-center mb-4">
-        <p class="text-[10px] tracking-[0.3em] uppercase text-zinc-500 font-medium">tarankurtz.com via Cloudflare</p>
+        <p class="text-[10px] tracking-[0.3em] uppercase text-zinc-500 font-medium">tarankurtz.com</p>
         <p class="text-[9px] tracking-widest uppercase text-zinc-600">- A Server for Friends and Family -</p>
     </div>
 
@@ -66,13 +64,13 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mb-12">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 w-full max-w-5xl mb-12">
         <div onclick="window.location.href=HFS_URL" class="flex flex-col items-center">
             <div id="hfsStatus" class="text-[8px] uppercase tracking-tighter mb-1 text-zinc-500 italic">Checking...</div>
             <div class="dashboard-card w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-blue-500 transition-all">
                 <div class="text-2xl mb-1">📂</div>
-                <div class="text-sm uppercase tracking-widest">Files</div>
-                <div class="absolute bottom-2 opacity-60 text-[9px] font-bold uppercase tracking-tighter text-zinc-400">User: guest | Pass: 1234</div>
+                <div class="text-[11px] uppercase tracking-widest">Files</div>
+                <div class="absolute bottom-2 opacity-60 text-[8px] font-bold uppercase tracking-tighter text-zinc-400">Guest: 1234</div>
             </div>
         </div>
 
@@ -80,17 +78,30 @@
             <div id="plexStatus" class="text-[8px] uppercase tracking-tighter mb-1 text-zinc-500 italic">Checking...</div>
             <div class="dashboard-card w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-orange-500 transition-all">
                 <div class="text-2xl mb-1">🎬</div>
-                <div class="text-sm uppercase tracking-widest">Plex</div>
-                <span onclick="event.stopPropagation(); requestPlexAccess();" class="absolute bottom-2 text-[9px] text-zinc-500 underline uppercase hover:text-orange-400">Request Access</span>
+                <div class="text-[11px] uppercase tracking-widest">Plex</div>
+                <span onclick="event.stopPropagation(); requestPlexAccess();" class="absolute bottom-2 text-[8px] text-zinc-500 underline uppercase hover:text-orange-400">Request Access</span>
             </div>
         </div>
 
-        <div onclick="toggleModal('requestModal')" class="flex flex-col items-center">
-            <div class="text-[8px] opacity-0 mb-1">.</div>
+        <div onclick="window.open('https://youtube.com', '_blank')" class="flex flex-col items-center pt-[13px]">
+            <div class="dashboard-card w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-red-600 transition-all">
+                <div class="text-2xl mb-1">📺</div>
+                <div class="text-[11px] uppercase tracking-widest">YouTube</div>
+            </div>
+        </div>
+
+        <div onclick="window.open('https://remotedesktop.google.com/access', '_blank')" class="flex flex-col items-center pt-[13px]">
+            <div class="dashboard-card w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-blue-400 transition-all">
+                <div class="text-2xl mb-1">🖥️</div>
+                <div class="text-[11px] uppercase tracking-widest">Remote</div>
+            </div>
+        </div>
+
+        <div onclick="toggleModal('requestModal')" class="flex flex-col items-center col-span-2 md:col-span-1 pt-[13px]">
             <div class="dashboard-card w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-emerald-500 transition-all">
                 <div class="text-2xl mb-1">📥</div>
-                <div class="text-sm uppercase tracking-widest">Request</div>
-                <span onclick="event.stopPropagation(); openListView();" class="absolute bottom-2 text-[10px] text-zinc-600 underline uppercase tracking-widest hover:text-white">View List</span>
+                <div class="text-[11px] uppercase tracking-widest">Request</div>
+                <span onclick="event.stopPropagation(); openListView();" class="absolute bottom-2 text-[9px] text-zinc-600 underline uppercase tracking-widest hover:text-white">View List</span>
             </div>
         </div>
     </div>
@@ -155,7 +166,6 @@
             checkOnlineStatus();
         })();
 
-        // Updated Ping Logic for Issue #3
         async function checkOnlineStatus() {
             fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('hfsStatus', true)).catch(() => setStatus('hfsStatus', false));
             fetch(NAS_PHYSICAL_IP, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('plexStatus', true)).catch(() => setStatus('plexStatus', false));
@@ -166,13 +176,11 @@
             if (el) el.innerHTML = online ? `<span class="status-dot bg-green-500 shadow-[0_0_5px_#22c55e]"></span> Online` : `<span class="status-dot bg-red-500"></span> Offline`;
         }
 
-        // Updated Search Logic for Issue #2
         function doSearch(type) {
             const q = document.getElementById('mainSearch').value; if(!q) return;
             if(type === 'google') {
                 window.location.href = `https://google.com/search?q=${encodeURIComponent(q)}`;
             } else {
-                // Gemini-specific query parameter
                 window.location.href = `https://gemini.google.com/app?q=${encodeURIComponent(q)}`;
             }
         }
