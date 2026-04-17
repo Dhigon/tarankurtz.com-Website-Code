@@ -8,6 +8,7 @@
     <style>
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+        .search-container:focus-within { border-color: #3b82f6; }
     </style>
 </head>
 <body class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-center p-6 font-sans">
@@ -15,21 +16,26 @@
     <script>
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_TOKEN = '5msRNVbv92Z_oVfyBcrv';
-        
-        // These are the internal logic links for your buttons
         const PLEX_URL = 'http://plex.tarankurtz.com:32400/web'; 
         const HFS_URL = 'https://transfer.tarankurtz.com:8443'; 
-        
         const ADMIN_PASS = 'Potatoes2!'; 
     </script>
 
     <h1 class="text-4xl font-light tracking-widest mb-10 text-center uppercase">Taran Kurtz</h1>
 
-    <div class="w-full max-w-xl mb-12">
-        <form action="https://google.com/search" method="get" class="relative text-center">
-            <input type="text" name="q" placeholder="Search Google or AI..." 
-                class="w-full bg-zinc-900 border border-zinc-800 rounded-full py-4 px-6 text-lg focus:outline-none focus:border-blue-500 transition-all text-center">
-        </form>
+    <div class="w-full max-w-2xl mb-12">
+        <div class="search-container flex items-center bg-zinc-900 border border-zinc-800 rounded-full px-2 py-2 transition-all shadow-xl">
+            <input type="text" id="mainSearch" placeholder="Search Google or ask AI..." 
+                class="flex-1 bg-transparent py-3 px-6 text-lg focus:outline-none text-white">
+            
+            <button onclick="doSearch('google')" class="p-3 hover:bg-zinc-800 rounded-full transition-colors group" title="Search Google">
+                <svg class="w-6 h-6 text-zinc-400 group-hover:text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.9 3.47-2.1 4.64-1.2 1.16-2.76 1.84-5.74 1.84-4.8 0-8.59-3.92-8.59-8.68s3.79-8.68 8.59-8.68c2.4 0 4.2 1 5.56 2.32l2.32-2.32C18.44 1.34 15.68 0 12.48 0 5.8 0 0 5.38 0 12s5.8 12 12.48 12c3.52 0 6.16-1.16 8.32-3.4 2.24-2.24 2.96-5.44 2.96-8.08 0-.64-.08-1.28-.16-1.92h-11.12z"/></svg>
+            </button>
+
+            <button onclick="doSearch('ai')" class="ml-1 p-3 bg-blue-600 hover:bg-blue-500 rounded-full transition-all shadow-lg group" title="Ask AI (Gemini)">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </button>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 w-full max-w-4xl mb-12">
@@ -58,13 +64,11 @@
         <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-2xl relative">
             <button onclick="closeRequestModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
             <h2 id="modalTitle" class="text-xl font-semibold mb-6 text-center text-emerald-400">Request Media</h2>
-            
             <div id="searchContainer">
                 <input type="text" id="movieSearch" placeholder="Search Movie/TV Title..." autocomplete="off"
                     class="w-full bg-zinc-900 border border-zinc-700 rounded-xl py-3 px-4 focus:outline-none focus:border-emerald-500 text-white">
                 <div id="results" class="mt-2 bg-zinc-800 border border-zinc-700 rounded-xl overflow-hidden hidden max-h-64 overflow-y-auto"></div>
             </div>
-
             <div id="drillDownContainer" class="hidden space-y-4 text-center">
                 <div id="drillDownResults" class="bg-zinc-800 border border-zinc-700 rounded-xl overflow-hidden max-h-64 overflow-y-auto"></div>
                 <div class="flex gap-2">
@@ -72,7 +76,6 @@
                     <button onclick="resetSearch()" class="flex-1 py-2 text-xs text-zinc-500 hover:text-white uppercase tracking-widest border border-zinc-800 rounded-lg">↩ Restart</button>
                 </div>
             </div>
-
             <div id="statusMsg" class="mt-4 p-3 rounded-xl text-center text-sm hidden"></div>
         </div>
     </div>
@@ -90,6 +93,23 @@
     </footer>
 
     <script>
+        // --- SEARCH LOGIC ---
+        function doSearch(type) {
+            const query = document.getElementById('mainSearch').value;
+            if (!query) return;
+            if (type === 'google') {
+                window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            } else {
+                window.location.href = `https://gemini.google.com/app?q=${encodeURIComponent(query)}`;
+            }
+        }
+        
+        // Listen for "Enter" key in the search bar
+        document.getElementById('mainSearch').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') doSearch('google');
+        });
+
+        // --- THE REST OF THE PORTAL LOGIC (REQUESTS/ADMIN) ---
         let adminMode = false;
         let selectedShow = null;
 
