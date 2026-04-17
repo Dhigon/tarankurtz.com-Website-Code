@@ -124,7 +124,7 @@
             data.results.slice(0, 5).forEach(item => {
                 const title = item.title || item.name;
                 const year = (item.release_date || item.first_air_date || '').split('-')[0];
-                const type = item.media_type; // 'movie' or 'tv'
+                const type = item.media_type;
                 if (!title) return;
                 const div = document.createElement('div');
                 div.className = 'p-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-700 last:border-0';
@@ -141,13 +141,21 @@
             selectedShow = { id, title, year };
             document.getElementById('searchContainer').classList.add('hidden');
             document.getElementById('drillDownContainer').classList.remove('hidden');
-            document.getElementById('modalTitle').innerText = "Select Season";
+            document.getElementById('modalTitle').innerText = "Select Detail";
             
             const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}`);
             const data = await res.json();
             
             const drillDiv = document.getElementById('drillDownResults');
             drillDiv.innerHTML = '';
+
+            // NEW OPTION: REQUEST ENTIRE SHOW (Requirement #1)
+            const showBtn = document.createElement('div');
+            showBtn.className = 'p-4 bg-emerald-600/30 hover:bg-emerald-600 cursor-pointer border-b border-emerald-500/50 text-center font-bold text-white';
+            showBtn.innerText = "Request Entire Series";
+            showBtn.onclick = () => runVerification(title, year);
+            drillDiv.appendChild(showBtn);
+
             data.seasons.forEach(s => {
                 const div = document.createElement('div');
                 div.className = 'p-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-700';
@@ -160,16 +168,14 @@
         function showEpisodeOptions(sNum, epCount) {
             const drillDiv = document.getElementById('drillDownResults');
             const sPad = sNum.toString().padStart(2, '0');
-            drillDiv.innerHTML = `<div class="p-4 bg-emerald-900/20 text-emerald-400 text-center font-bold border-b border-emerald-900/50">Season ${sNum}</div>`;
+            drillDiv.innerHTML = `<div class="p-4 bg-blue-900/20 text-blue-400 text-center font-bold border-b border-blue-900/50">Season ${sNum}</div>`;
             
-            // Option 1: Full Season
             const fullS = document.createElement('div');
-            fullS.className = 'p-3 hover:bg-emerald-600 cursor-pointer border-b border-zinc-700 text-center font-bold';
+            fullS.className = 'p-3 hover:bg-blue-600 cursor-pointer border-b border-zinc-700 text-center font-bold';
             fullS.innerText = "Request Entire Season";
             fullS.onclick = () => runVerification(selectedShow.title, selectedShow.year, `[S${sPad}]`);
             drillDiv.appendChild(fullS);
 
-            // Option 2: Individual Episodes
             for(let i=1; i<=epCount; i++) {
                 const epPad = i.toString().padStart(2, '0');
                 const div = document.createElement('div');
@@ -197,7 +203,6 @@
             try {
                 const plexRes = await fetch(`${PLEX_BASE_URL}/search?query=${encodeURIComponent(title)}&X-Plex-Token=${PLEX_TOKEN}`);
                 const text = await plexRes.text();
-                // If it's a specific episode/season, we still check if the show exists
                 if (text.includes(title) && tag === "") {
                     statusMsg.innerHTML = `✅ Already on Plex!`;
                     statusMsg.classList.add('bg-blue-900/20', 'text-blue-400');
