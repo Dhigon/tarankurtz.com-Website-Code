@@ -87,18 +87,25 @@
         <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative modal-fixed-height">
             <button onclick="closeRequestModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
             <h2 class="text-xl font-semibold mb-6 text-center text-emerald-400 uppercase">Media Request</h2>
-            <div id="searchContainer" class="flex flex-col overflow-hidden">
+            
+            <div id="searchContainer" class="flex flex-col overflow-hidden flex-1">
                 <input type="text" id="movieSearch" placeholder="Search Movie/TV..." class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-emerald-500">
                 <div id="results" class="mt-4 bg-zinc-800 border border-zinc-700 rounded-xl hidden overflow-y-auto"></div>
             </div>
-            <div id="drillDownContainer" class="hidden flex flex-col overflow-hidden">
+
+            <div id="drillDownContainer" class="hidden flex flex-col overflow-hidden flex-1">
                 <div id="drillDownResults" class="bg-zinc-800 border border-zinc-700 rounded-xl overflow-y-auto flex-1"></div>
                 <div class="flex gap-2 mt-4">
                     <button id="backToSeasonBtn" onclick="backToSeasons()" class="hidden flex-1 py-2 text-xs text-blue-400 border border-blue-900/50 rounded-lg uppercase">← Back</button>
                     <button onclick="resetSearch()" class="flex-1 py-2 text-xs text-red-500 border border-red-900/40 rounded-lg uppercase hover:bg-red-950/30 transition-colors">Restart</button>
                 </div>
             </div>
+
             <div id="statusMsg" class="mt-4 p-3 rounded-xl text-center text-sm hidden"></div>
+
+            <div class="mt-6 pt-4 border-t border-zinc-800 text-center">
+                <button onclick="closeRequestModal(); openListView();" class="text-[10px] text-zinc-500 hover:text-emerald-400 tracking-widest uppercase underline underline-offset-4">View Current Queue</button>
+            </div>
         </div>
     </div>
 
@@ -116,7 +123,7 @@
     <div id="adminPanel" class="fixed bottom-20 bg-zinc-900 border border-zinc-800 p-6 rounded-2xl hidden flex-col gap-4 shadow-2xl z-50 w-80">
         <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-2">Settings</h3>
         <input type="text" id="adminTitleIn" placeholder="Website Title..." class="w-full bg-zinc-800 p-2 text-xs rounded border border-zinc-700 outline-none">
-        <input type="text" id="adminBgIn" placeholder="Background Name (e.g. 1)..." class="w-full bg-zinc-800 p-2 text-xs rounded border border-zinc-700 outline-none">
+        <input type="text" id="adminBgIn" placeholder="Ex: Background - 1 (No .jpg)..." class="w-full bg-zinc-800 p-2 text-xs rounded border border-zinc-700 outline-none">
         <button onclick="saveAdminChanges()" class="bg-blue-600 py-2 rounded text-[10px] font-bold uppercase">Apply Changes</button>
     </div>
 
@@ -141,11 +148,12 @@
             const savedTitle = localStorage.getItem('portalTitle') || "Taran's Portal";
             document.getElementById('editableTitle').innerText = savedTitle;
             const bg = localStorage.getItem('portalBg');
-            if(bg) document.getElementById('mainBody').style.backgroundImage = `url('${bg}')`;
+            if(bg) document.getElementById('mainBody').style.backgroundImage = `url("${bg}")`;
             window.addEventListener('load', checkOnlineStatus);
         })();
 
         async function checkOnlineStatus() {
+            // Note: Cloudflare Proxy often blocks these status checks.
             fetch(HFS_URL, { mode: 'no-cors' }).then(() => setStatus('hfsStatus', true)).catch(() => setStatus('hfsStatus', false));
             fetch(`${PLEX_URL}/identity`, { mode: 'no-cors' }).then(() => setStatus('plexStatus', true)).catch(() => setStatus('plexStatus', false));
         }
@@ -256,12 +264,11 @@
             const b = document.getElementById('adminBgIn').value;
             if(t) { localStorage.setItem('portalTitle', t); document.getElementById('editableTitle').innerText = t; }
             if(b) { 
-                // Enhanced Logic for HFS: Replaces spaces with %20 and forces .jpg
-                let cleanB = b.replace(/Background - /g, "").replace(/\.jpg/g, "").trim();
-                const fileName = `Background - ${cleanB}.jpg`;
-                const fullUrl = b.startsWith('http') ? b : `${ASSETS_URL}${encodeURIComponent(fileName)}`; 
+                // Request #2: More robust background setting
+                let cleanB = b.replace(/\.jpg/g, "").trim(); 
+                const fullUrl = b.startsWith('http') ? b : `${ASSETS_URL}${encodeURIComponent(cleanB)}.jpg`; 
                 localStorage.setItem('portalBg', fullUrl); 
-                document.getElementById('mainBody').style.backgroundImage = `url('${fullUrl}')`; 
+                document.getElementById('mainBody').style.backgroundImage = `url("${fullUrl}")`; 
             }
             alert("Changes applied!");
         }
