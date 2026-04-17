@@ -7,8 +7,9 @@
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3585/3585145.png">
-    <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/3585/3585145.png">
+    
+    <link rel="apple-touch-icon" href="https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
+    <link rel="icon" type="image/jpeg" href="https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -195,73 +196,4 @@
                 const title = item.title || item.name; const year = (item.release_date || item.first_air_date || '').split('-')[0];
                 const div = document.createElement('div'); div.className = 'p-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-700 text-xs';
                 div.innerHTML = `<b>${title}</b> (${year})`;
-                div.onclick = () => item.media_type === 'tv' ? startTvFlow(item.id, title, year) : runVerification(title, year, "", "MOVIE");
-                results.appendChild(div);
-            });
-        });
-
-        async function startTvFlow(id, title, year) {
-            selectedShow = { id, title, year };
-            document.getElementById('searchContainer').classList.add('hidden');
-            document.getElementById('drillDownContainer').classList.remove('hidden');
-            const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}`);
-            const data = await res.json();
-            const box = document.getElementById('drillDownResults');
-            document.getElementById('backToSeasonBtn').classList.add('hidden');
-            box.innerHTML = `<div class="p-3 bg-emerald-600/20 text-center text-xs cursor-pointer mb-2" onclick="runVerification('${title}', '${year}', '', 'TV')">Request Full Series</div>`;
-            data.seasons.forEach(s => {
-                if(s.season_number === 0) return;
-                const d = document.createElement('div'); d.className = 'p-3 hover:bg-zinc-700 border-b border-zinc-700 text-xs cursor-pointer'; d.innerText = s.name;
-                d.onclick = () => {
-                    document.getElementById('backToSeasonBtn').classList.remove('hidden');
-                    box.innerHTML = `<div class="p-3 bg-blue-600/20 text-center text-xs cursor-pointer mb-2" onclick="runVerification('${title}', '${year}', '[S${s.season_number}]', 'TV')">Request Entire Season ${s.season_number}</div>`;
-                    for(let i=1; i<=s.episode_count; i++) {
-                        const ep = document.createElement('div'); ep.className = 'p-2 hover:bg-zinc-700 border-b border-zinc-700 text-[10px] pl-6 cursor-pointer'; ep.innerText = `Episode ${i}`;
-                        ep.onclick = () => runVerification(title, year, `[S${s.season_number}E${i.toString().padStart(2,'0')}]`, "TV");
-                        box.appendChild(ep);
-                    }
-                };
-                box.appendChild(d);
-            });
-        }
-
-        async function runVerification(title, year, tag, type) {
-            const entry = `${title} (${year}) ${tag} - ${type}`.trim();
-            const msg = document.getElementById('statusMsg');
-            let list = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
-            msg.classList.remove('hidden');
-            if(list.some(r => r.title === entry)) {
-                msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-zinc-800 text-yellow-400";
-                msg.innerText = "⚠️ Already in list!";
-            } else {
-                list.push({ title: entry, id: Date.now() });
-                localStorage.setItem('mediaRequests', JSON.stringify(list));
-                msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-zinc-800 text-emerald-400";
-                msg.innerText = "🚀 Added to Queue!";
-            }
-        }
-
-        function toggleModal(id) { const m = document.getElementById(id); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
-        function openListView() { renderRequests(); toggleModal('listModal'); }
-        function closeRequestModal() { toggleModal('requestModal'); resetSearch(); }
-        function resetSearch() { document.getElementById('movieSearch').value = ''; document.getElementById('searchContainer').classList.remove('hidden'); document.getElementById('drillDownContainer').classList.add('hidden'); document.getElementById('results').classList.add('hidden'); document.getElementById('statusMsg').classList.add('hidden'); selectedShow = null; }
-        function backToSeasons() { if(selectedShow) startTvFlow(selectedShow.id, selectedShow.title, selectedShow.year); }
-        function requestPlexAccess() { const email = prompt("Enter your Plex email:"); if (email) window.location.href = `mailto:taran.kurtz@gmail.com?subject=Plex Portal Access Request&body=Requesting access for Plex Email: ${email}`; }
-        function renderRequests() {
-            const list = document.getElementById('publicRequestList');
-            const data = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
-            list.innerHTML = data.length === 0 ? '<li class="text-zinc-600 italic text-center text-xs py-10">Queue is empty</li>' :
-                data.map(req => `<li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-800 text-[11px]"><span>${req.title}</span>${adminMode ? `<button onclick="removeReq(${req.id})" class="text-red-500 px-2">✕</button>` : ''}</li>`).join('');
-            if(adminMode) document.getElementById('adminListControls').classList.remove('hidden');
-        }
-        function verifyAdmin() { if (prompt("Code:") === ADMIN_PASS) { adminMode = true; document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('adminPanel').classList.add('flex'); } }
-        function saveAdminChanges() {
-            const t = document.getElementById('adminTitleIn').value;
-            if(t) { localStorage.setItem('portalTitle', t); document.getElementById('editableTitle').innerText = t; }
-            alert("Updated!");
-        }
-        function removeReq(id) { let data = JSON.parse(localStorage.getItem('mediaRequests') || '[]'); localStorage.setItem('mediaRequests', JSON.stringify(data.filter(r => r.id !== id))); renderRequests(); }
-        function clearAllRequests() { if(confirm("Clear everything?")) { localStorage.setItem('mediaRequests', '[]'); renderRequests(); } }
-    </script>
-</body>
-</html>
+                div.onclick = () => item.media_type === 'tv' ? startTvFlow(item.id, title, year) : runVerification(title,
