@@ -15,10 +15,11 @@
     <script>
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_TOKEN = '5msRNVbv92Z_oVfyBcrv';
-        const PLEX_IP = '107.220.202.150'; 
+        // Updated to use main domain for Plex API calls
+        const PLEX_BASE_URL = 'http://tarankurtz.com:32400'; 
     </script>
 
-    <h1 class="text-4xl font-light tracking-widest mb-10 text-center">TARAN KURTZ</h1>
+    <h1 class="text-4xl font-light tracking-widest mb-10 text-center uppercase">Taran Kurtz</h1>
 
     <div class="w-full max-w-xl mb-12">
         <form action="https://google.com/search" method="get" class="relative">
@@ -53,13 +54,11 @@
         <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-2xl relative">
             <button onclick="toggleModal('requestModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
             <h2 class="text-xl font-semibold mb-6 text-center text-emerald-400">Media Request</h2>
-            
             <div class="relative">
                 <input type="text" id="movieSearch" placeholder="Search Movie or TV Name..." autocomplete="off"
                     class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 focus:outline-none focus:border-emerald-500">
                 <div id="results" class="absolute w-full mt-2 bg-zinc-800 border border-zinc-700 rounded-xl overflow-hidden hidden z-50 shadow-2xl"></div>
             </div>
-
             <div id="statusMsg" class="mt-4 p-3 rounded-xl text-center text-sm hidden"></div>
         </div>
     </div>
@@ -68,8 +67,7 @@
         <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-2xl relative">
             <button onclick="toggleModal('listModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
             <h2 class="text-xl font-semibold mb-6 text-center text-yellow-400">Pending Requests</h2>
-            <ul id="publicRequestList" class="space-y-3 max-h-96 overflow-y-auto pr-2">
-                </ul>
+            <ul id="publicRequestList" class="space-y-3 max-h-96 overflow-y-auto pr-2"></ul>
         </div>
     </div>
 
@@ -93,7 +91,6 @@
             renderRequests();
         }
 
-        // SEARCH & VERIFICATION LOGIC
         const searchInput = document.getElementById('movieSearch');
         const resultsDiv = document.getElementById('results');
         const statusMsg = document.getElementById('statusMsg');
@@ -126,33 +123,32 @@
             statusMsg.classList.remove('hidden', 'bg-red-900/20', 'text-red-400', 'bg-blue-900/20', 'text-blue-400', 'bg-yellow-900/20', 'text-yellow-400');
             statusMsg.innerText = "Checking availability...";
 
-            // 1. Check local Request List first
             const existingRequests = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
             const isAlreadyRequested = existingRequests.some(r => r.title.toLowerCase() === title.toLowerCase());
 
             if (isAlreadyRequested) {
-                statusMsg.innerHTML = `⚠️ "${title}" is already on the request list!`;
+                statusMsg.innerHTML = `⚠️ Already on the request list!`;
                 statusMsg.classList.add('bg-yellow-900/20', 'text-yellow-400');
                 return;
             }
 
-            // 2. Check Plex
             try {
-                const plexRes = await fetch(`http://${PLEX_IP}:32400/search?query=${encodeURIComponent(title)}&X-Plex-Token=${PLEX_TOKEN}`);
+                // Plex API Check
+                const plexRes = await fetch(`${PLEX_BASE_URL}/search?query=${encodeURIComponent(title)}&X-Plex-Token=${PLEX_TOKEN}`);
                 const text = await plexRes.text();
                 
                 if (text.includes(title)) {
-                    statusMsg.innerHTML = `✅ "${title}" is already on Plex!`;
+                    statusMsg.innerHTML = `✅ Already on Plex!`;
                     statusMsg.classList.add('bg-blue-900/20', 'text-blue-400');
                 } else {
                     addRequest(title, year);
-                    statusMsg.innerHTML = `🚀 Success! Added to the queue.`;
+                    statusMsg.innerHTML = `🚀 Added to the queue.`;
                     statusMsg.classList.add('bg-emerald-900/20', 'text-emerald-400');
                     setTimeout(() => toggleModal('requestModal'), 2000);
                 }
             } catch (err) {
-                addRequest(title, year); // Add anyway if Plex is down
-                statusMsg.innerHTML = "Added (Plex connection offline)";
+                addRequest(title, year);
+                statusMsg.innerHTML = "Added (Plex check skipped)";
             }
         }
 
@@ -165,27 +161,17 @@
         function renderRequests() {
             const list = document.getElementById('publicRequestList');
             const requests = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
-            
-            if (requests.length === 0) {
-                list.innerHTML = `<li class="text-zinc-600 italic text-center">The list is currently empty.</li>`;
-                return;
-            }
-
-            list.innerHTML = requests.map(req => `
+            list.innerHTML = requests.length === 0 ? `<li class="text-zinc-600 italic text-center">No pending requests.</li>` : 
+                requests.map(req => `
                 <li class="flex justify-between items-center bg-zinc-800/50 p-4 rounded-2xl border border-zinc-800">
-                    <div>
-                        <div class="font-medium">${req.title}</div>
-                        <div class="text-zinc-500 text-xs">${req.year}</div>
-                    </div>
-                    ${adminMode ? `<button onclick="removeReq(${req.id})" class="text-xs text-red-400 hover:text-white bg-red-900/20 px-3 py-1 rounded-lg">Delete</button>` : `<span class="text-[10px] text-zinc-600 uppercase tracking-widest">Pending</span>`}
-                </li>
-            `).join('');
+                    <div><div class="font-medium">${req.title}</div><div class="text-zinc-500 text-xs">${req.year}</div></div>
+                    ${adminMode ? `<button onclick="removeReq(${req.id})" class="text-xs text-red-400 bg-red-900/20 px-3 py-1 rounded-lg">Delete</button>` : `<span class="text-[10px] text-zinc-600 uppercase tracking-widest">Pending</span>`}
+                </li>`).join('');
         }
 
         function removeReq(id) {
             let requests = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
-            requests = requests.filter(r => r.id !== id);
-            localStorage.setItem('mediaRequests', JSON.stringify(requests));
+            localStorage.setItem('mediaRequests', JSON.stringify(requests.filter(r => r.id !== id)));
             renderRequests();
         }
     </script>
