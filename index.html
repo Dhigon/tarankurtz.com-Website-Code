@@ -19,15 +19,17 @@
 <body id="mainBody" class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-center p-6 font-sans bg-custom">
 
     <script>
-        // --- UPDATED CONFIGURATION ---
+        /** * GLOBAL CONFIGURATION
+         * Centralized variables for API keys, Server URLs, and Admin credentials.
+         */
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_TOKEN = '5msRNVbv92Z_oVfyBcrv';
         const PLEX_URL = 'https://plex.tarankurtz.com'; 
         const HFS_URL = 'https://transfer.tarankurtz.com:8443'; 
-        // Corrected path to your KurtzHome610 directory
         const ASSETS_URL = 'https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/';
         const ADMIN_PASS = 'Potatoes2!';
         
+        // Initialize EmailJS for the Plex Request feature
         (function() { emailjs.init("YOUR_PUBLIC_KEY"); })();
     </script>
 
@@ -106,25 +108,24 @@
         </div>
     </footer>
 
-    <div id="requestModal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[60] p-4">...</div>
-    <div id="listModal" class="fixed inset-0 bg-black/95 hidden items-center justify-center z-[60] p-4">...</div>
-
     <script>
-        // --- SMART BACKGROUND HANDLER ---
+        /**
+         * SMART BACKGROUND HANDLER
+         * Automatically attempts to find and set background images from HFS folder.
+         * Detects .jpg, .png, .webp, and .jpeg based on a simple name input.
+         */
         async function setSmartBackground(baseName) {
             if (!baseName) return;
             const prefix = "Background - ";
             const extensions = ['.jpg', '.png', '.webp', '.jpeg'];
             const mainBody = document.getElementById('mainBody');
 
-            // If it's a full URL, just set it
             if (baseName.startsWith('http')) {
                 mainBody.style.backgroundImage = `url('${baseName}')`;
                 localStorage.setItem('portalBg', baseName);
                 return;
             }
 
-            // Loop extensions to find existing file
             for (let ext of extensions) {
                 const fileName = prefix + baseName + ext;
                 const testUrl = ASSETS_URL + encodeURIComponent(fileName);
@@ -137,7 +138,7 @@
                     }
                 } catch (e) {}
             }
-            alert("Background file not found. Check filename in HFS.");
+            alert("Background file not found. Ensure it starts with 'Background - '.");
         }
 
         window.onload = () => {
@@ -146,6 +147,9 @@
             if(savedBg) document.getElementById('mainBody').style.backgroundImage = `url('${savedBg}')`;
         };
 
+        /** * ADMIN ACTIONS
+         * Saves UI preferences to local browser storage.
+         */
         function saveAdminChanges() {
             const t = document.getElementById('adminTitleIn').value;
             const b = document.getElementById('adminBgIn').value;
@@ -154,6 +158,10 @@
             document.getElementById('adminPanel').classList.add('hidden');
         }
 
+        /**
+         * PLEX EMAIL AUTOMATION
+         * Uses EmailJS to relay a guest's Plex email to your Gmail account.
+         */
         function sendPlexEmail() {
             const email = document.getElementById('plexEmailInput').value;
             const status = document.getElementById('plexStatusMsg');
@@ -178,7 +186,7 @@
             });
         }
 
-        // Generic Helpers
+        // --- UTILITY HELPERS ---
         function toggleModal(id) { 
             const el = document.getElementById(id); 
             el.classList.toggle('hidden'); 
