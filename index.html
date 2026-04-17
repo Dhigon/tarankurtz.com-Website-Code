@@ -1,4 +1,52 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taran's Portal</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Taran Portal">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10156/10156015.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
+        .bg-custom { 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed; 
+            transition: background-image 0.8s ease-in-out; 
+            background-color: #09090b; /* Zinc-950 fallback */
+        }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .dashboard-card { 
+            height: 160px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            position: relative; 
+            cursor: pointer;
+        }
+        .sub-link { 
+            position: absolute; 
+            bottom: 12px; 
+            font-size: 10px; 
+            color: #52525b; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em; 
+            text-decoration: underline; 
+            z-index: 50; 
+        }
+        .sub-link:hover { color: #ffffff; }
+        @media (min-width: 768px) { .top-header { margin-top: -8vh; } }
+    </style>
+</head>
+<body id="mainBody" class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-center p-6 font-sans bg-custom">
+
+    <script>
         /** * CONFIGURATION */
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_TOKEN = '5msRNVbv92Z_oVfyBcrv';
@@ -8,65 +56,234 @@
         const ADMIN_PASS = 'Potatoes2!'; 
     </script>
 
-<script>
-        /** * LOGIC UPDATE: EXTENDED TIMEOUT & MANUAL CLOSE */
-        
+    <div class="text-center top-header mb-4">
+        <p class="text-xs tracking-[0.3em] uppercase text-zinc-500 font-medium">taran.kurtz.com</p>
+        <p class="text-[10px] tracking-widest uppercase text-zinc-600">- A Server for Friends and Family -</p>
+    </div>
+
+    <h1 id="editableTitle" class="text-4xl font-light tracking-widest mb-10 text-center uppercase min-h-[1em]"></h1>
+
+    <div class="w-full max-w-2xl mb-12">
+        <div class="flex items-center bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded-full px-2 py-2 shadow-xl">
+            <input type="text" id="mainSearch" placeholder="Search Google or ask AI..." class="flex-1 bg-transparent py-3 px-6 text-lg focus:outline-none text-white">
+            <div class="flex gap-1 pr-2">
+                <button onclick="doSearch('ai')" class="p-3 bg-blue-600 hover:bg-blue-500 rounded-full transition-all text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </button>
+                <button onclick="doSearch('google')" class="p-3 hover:bg-zinc-800 rounded-full transition-colors text-zinc-400">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.9 3.47-2.1 4.64-1.2 1.16-2.76 1.84-5.74 1.84-4.8 0-8.59-3.92-8.59-8.68s3.79-8.68 8.59-8.68c2.4 0 4.2 1 5.56 2.32l2.32-2.32C18.44 1.34 15.68 0 12.48 0 5.8 0 0 5.38 0 12s5.8 12 12.48 12c3.52 0 6.16-1.16 8.32-3.4 2.24-2.24 2.96-5.44 2.96-8.08 0-.64-.08-1.28-.16-1.92h-11.12z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mb-12">
+        <div class="flex flex-col items-center">
+            <div id="hfsStatus" class="text-[9px] uppercase tracking-tighter mb-1 text-zinc-500 italic">Checking...</div>
+            <div onclick="window.location.href=HFS_URL" class="dashboard-card w-full group bg-zinc-900/90 border border-zinc-800 rounded-2xl text-center hover:border-blue-500 transition-all">
+                <div class="text-3xl mb-1">📂</div>
+                <div class="text-sm font-medium group-hover:text-blue-400">Files</div>
+                <div class="absolute bottom-2 opacity-40 group-hover:opacity-100 transition-opacity">
+                    <span class="text-[9px] text-zinc-400 uppercase font-bold tracking-tighter">Guest: 1234</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center">
+            <div id="plexStatus" class="text-[9px] uppercase tracking-tighter mb-1 text-zinc-500 italic">Checking...</div>
+            <div onclick="window.open(PLEX_URL, '_blank')" class="dashboard-card w-full group bg-zinc-900/90 border border-zinc-800 rounded-2xl text-center hover:border-orange-500 transition-all">
+                <div class="text-3xl mb-1">🎬</div>
+                <div class="text-sm font-medium group-hover:text-orange-400">Plex</div>
+                <a href="mailto:taran@tarankurtz.com?subject=Plex Access Request" class="sub-link" onclick="event.stopPropagation()">Request Access</a>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center">
+            <div class="text-[9px] opacity-0 mb-1">.</div>
+            <div onclick="toggleModal('requestModal')" class="dashboard-card w-full group bg-zinc-900/90 border border-zinc-800 rounded-2xl text-center hover:border-emerald-500 transition-all">
+                <div class="text-3xl mb-1">📥</div>
+                <div class="text-sm font-medium group-hover:text-emerald-400">Request</div>
+                <span onclick="event.stopPropagation(); openListView();" class="sub-link">View List</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="requestModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
+        <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative">
+            <button onclick="closeRequestModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
+            <h2 id="modalTitle" class="text-xl font-semibold mb-6 text-center text-emerald-400 uppercase">Request Media</h2>
+            <div id="searchContainer">
+                <input type="text" id="movieSearch" placeholder="Search Movie/TV..." class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-emerald-500">
+                <div id="results" class="mt-2 bg-zinc-800 border border-zinc-700 rounded-xl hidden max-h-64 overflow-y-auto shadow-2xl"></div>
+            </div>
+            <div id="drillDownContainer" class="hidden space-y-4">
+                <div id="drillDownResults" class="bg-zinc-800 border border-zinc-700 rounded-xl max-h-64 overflow-y-auto"></div>
+                <div class="flex gap-2">
+                    <button id="backToSeasonBtn" onclick="backToSeasons()" class="hidden flex-1 py-2 text-xs text-blue-400 border border-blue-900/50 rounded-lg uppercase">← Back</button>
+                    <button onclick="resetSearch()" class="flex-1 py-2 text-xs text-zinc-500 border border-zinc-800 rounded-lg uppercase">Restart</button>
+                </div>
+            </div>
+            <div id="statusMsg" class="mt-4 p-3 rounded-xl text-center text-sm hidden"></div>
+        </div>
+    </div>
+
+    <div id="listModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
+        <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative">
+            <button onclick="toggleModal('listModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
+            <h2 class="text-xl font-semibold mb-6 text-center text-yellow-400 uppercase">Current Queue</h2>
+            <ul id="publicRequestList" class="space-y-2 max-h-96 overflow-y-auto p-2"></ul>
+        </div>
+    </div>
+
+    <div id="adminPanel" class="fixed bottom-20 bg-zinc-900 border border-zinc-800 p-6 rounded-2xl hidden flex-col gap-4 shadow-2xl z-50 w-80">
+        <h3 class="text-xs font-bold text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-2">Admin Dashboard</h3>
+        <input type="text" id="adminTitleIn" placeholder="Website Title..." class="w-full bg-zinc-800 p-2 text-xs rounded border border-zinc-700 outline-none">
+        <input type="text" id="adminBgIn" placeholder="Background Name/URL..." class="w-full bg-zinc-800 p-2 text-xs rounded border border-zinc-700 outline-none">
+        <button onclick="saveAdminChanges()" class="bg-blue-600 py-2 rounded text-[10px] font-bold uppercase">Apply</button>
+    </div>
+
+    <footer class="mt-20 flex flex-col items-center gap-4">
+        <div onclick="verifyAdmin()" class="text-zinc-800 text-[9px] tracking-[0.4em] cursor-pointer hover:text-zinc-500 uppercase">
+            Private Admin Dashboard
+        </div>
+    </footer>
+
+    <script>
+        let selectedShow = null;
+        let adminMode = false;
+
+        // Init: Run immediately to set the title before the user sees it
+        (function init() {
+            const savedTitle = localStorage.getItem('portalTitle') || 'Taran Kurtz';
+            const titleEl = document.getElementById('editableTitle');
+            if (titleEl) titleEl.innerText = savedTitle;
+            
+            const bg = localStorage.getItem('portalBg');
+            if(bg) document.getElementById('mainBody').style.backgroundImage = `url('${bg}')`;
+            
+            // Check status after load
+            window.addEventListener('load', checkOnlineStatus);
+        })();
+
+        // Status Logic
+        async function checkOnlineStatus() {
+            fetch(HFS_URL, { mode: 'no-cors' }).then(() => setStatus('hfsStatus', true)).catch(() => setStatus('hfsStatus', false));
+            fetch(`${PLEX_URL}/identity`, { mode: 'no-cors' }).then(() => setStatus('plexStatus', true)).catch(() => setStatus('plexStatus', false));
+        }
+        function setStatus(id, online) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = online ? `<span class="status-dot bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></span> Online` : `<span class="status-dot bg-red-500"></span> Offline`;
+        }
+
+        // Search Handlers
+        function doSearch(type) {
+            const q = document.getElementById('mainSearch').value;
+            if(!q) return;
+            window.location.href = type === 'google' ? `https://google.com/search?q=${encodeURIComponent(q)}` : `https://gemini.google.com/app?q=${encodeURIComponent(q)}`;
+        }
+
+        // TMDB Logic
+        document.getElementById('movieSearch').addEventListener('input', async (e) => {
+            const val = e.target.value;
+            if (val.length < 3) { document.getElementById('results').classList.add('hidden'); return; }
+            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&query=${val}`);
+            const data = await res.json();
+            const results = document.getElementById('results');
+            results.innerHTML = ''; results.classList.remove('hidden');
+            data.results.slice(0, 5).forEach(item => {
+                const title = item.title || item.name;
+                const year = (item.release_date || item.first_air_date || '').split('-')[0];
+                const div = document.createElement('div');
+                div.className = 'p-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-700 text-xs';
+                div.innerHTML = `<span class="font-bold">${title}</span> <span class="text-zinc-500">(${year})</span>`;
+                div.onclick = (e) => { e.stopPropagation(); item.media_type === 'tv' ? startTvFlow(item.id, title, year) : runVerification(title, year, "", "MOVIE"); };
+                results.appendChild(div);
+            });
+        });
+
+        async function startTvFlow(id, title, year) {
+            selectedShow = { id, title, year };
+            document.getElementById('searchContainer').classList.add('hidden');
+            document.getElementById('drillDownContainer').classList.remove('hidden');
+            const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}`);
+            const data = await res.json();
+            const box = document.getElementById('drillDownResults');
+            box.innerHTML = `<div class="p-3 bg-emerald-600/20 text-center text-xs cursor-pointer font-bold" onclick="runVerification('${title}', '${year}', '', 'TV')">Request Entire Series</div>`;
+            data.seasons.forEach(s => {
+                const d = document.createElement('div');
+                d.className = 'p-3 hover:bg-zinc-700 border-b border-zinc-700 text-xs cursor-pointer';
+                d.innerText = `${s.name} (${s.episode_count} Episodes)`;
+                d.onclick = () => {
+                    document.getElementById('backToSeasonBtn').classList.remove('hidden');
+                    box.innerHTML = `<div class="p-3 bg-blue-600/20 text-center text-xs cursor-pointer font-bold" onclick="runVerification('${title}', '${year}', '[S${s.season_number}]', 'TV')">Request Season ${s.season_number}</div>`;
+                    for(let i=1; i<=s.episode_count; i++) {
+                        const ep = document.createElement('div');
+                        ep.className = 'p-2 hover:bg-zinc-700 border-b border-zinc-700 text-[10px] pl-6 text-zinc-400 cursor-pointer';
+                        ep.innerText = `Episode ${i}`;
+                        ep.onclick = () => runVerification(title, year, `[S${s.season_number}E${i.toString().padStart(2,'0')}]`, "TV");
+                        box.appendChild(ep);
+                    }
+                };
+                box.appendChild(d);
+            });
+        }
+
         async function runVerification(title, year, tag, type) {
             const entry = `${title} (${year}) ${tag} - ${type}`.trim();
             const msg = document.getElementById('statusMsg');
-            
-            // Reset message state
             msg.className = "mt-4 p-3 rounded-xl text-center text-sm bg-zinc-800 block text-white";
-            msg.innerText = "Checking Library..."; 
-            msg.classList.remove('hidden');
+            msg.innerText = "Checking Library..."; msg.classList.remove('hidden');
 
             const controller = new AbortController();
-            // RULE: Increased timeout to 5 seconds for slower connections
-            const tId = setTimeout(() => controller.abort(), 5000); 
+            const tId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
             try {
                 const plexRes = await fetch(`${PLEX_URL}/search?query=${encodeURIComponent(title)}&X-Plex-Token=${PLEX_TOKEN}`, { signal: controller.signal });
                 const text = await plexRes.text();
                 clearTimeout(tId);
-                
                 if(text.includes(title) && tag === "") {
-                    msg.innerText = "✅ Already on Plex!"; 
-                    msg.classList.remove('text-white');
-                    msg.classList.add('text-blue-400'); 
-                    return; // Stop here if found
+                    msg.innerText = "✅ Already on Plex!"; msg.classList.add('text-blue-400'); return;
                 }
-            } catch(e) { 
-                console.log("Plex check bypassed (Timeout or Blocked) - Adding to local queue."); 
-            }
+            } catch(e) { console.log("Plex timeout - adding to queue."); }
 
-            // ADD TO LOCALSTORAGE QUEUE
             let list = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
             if(!list.some(r => r.title === entry)) {
                 list.push({ title: entry, id: Date.now() });
                 localStorage.setItem('mediaRequests', JSON.stringify(list));
-                
-                msg.innerText = "🚀 Added to Queue!"; 
-                msg.classList.remove('text-white');
-                msg.classList.add('text-emerald-400');
-                
-                // RULE: Removed auto-close. User must click 'Restart' or 'X' to finish.
-                // This allows them to see the confirmation or request more items.
+                msg.innerText = "🚀 Added to Queue!"; msg.classList.add('text-emerald-400');
+                // Removed auto-close as requested
             } else {
-                msg.innerText = "⚠️ Already in list!"; 
-                msg.classList.remove('text-white');
-                msg.classList.add('text-yellow-400');
+                msg.innerText = "⚠️ Already in list!"; msg.classList.add('text-yellow-400');
             }
         }
 
-        // Updated Reset Function to handle the "Stay Open" workflow
-        function resetSearch() {
-            document.getElementById('searchContainer').classList.remove('hidden');
-            document.getElementById('drillDownContainer').classList.add('hidden');
-            document.getElementById('movieSearch').value = "";
-            document.getElementById('results').classList.add('hidden');
-            document.getElementById('statusMsg').classList.add('hidden'); // Hide status when starting over
-            selectedShow = null;
+        // View/List Handlers
+        function openListView() { renderRequests(); toggleModal('listModal'); }
+        function renderRequests() {
+            const list = document.getElementById('publicRequestList');
+            const data = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
+            list.innerHTML = data.length === 0 ? '<li class="text-zinc-600 italic text-center text-xs">Queue is empty</li>' :
+                data.map(req => `<li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-800 text-[11px]"><span>${req.title}</span>${adminMode ? `<button onclick="removeReq(${req.id})" class="text-red-500">DEL</button>` : `<span class="text-zinc-600">Pending</span>`}</li>`).join('');
+        }
+        function removeReq(id) {
+            let data = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
+            localStorage.setItem('mediaRequests', JSON.stringify(data.filter(r => r.id !== id)));
+            renderRequests();
         }
 
-        // ... [Include all other functions from Iteration 32: checkOnlineStatus, renderRequests, verifyAdmin, etc.] ...
+        // Admin/Modal Utilities
+        function verifyAdmin() { if (prompt("Admin Code:") === ADMIN_PASS) { adminMode = true; document.getElementById('adminPanel').classList.remove('hidden'); document.getElementById('adminPanel').classList.add('flex'); } }
+        function saveAdminChanges() {
+            const t = document.getElementById('adminTitleIn').value;
+            const b = document.getElementById('adminBgIn').value;
+            if(t) { localStorage.setItem('portalTitle', t); document.getElementById('editableTitle').innerText = t; }
+            if(b) { const url = b.startsWith('http') ? b : ASSETS_URL + b; localStorage.setItem('portalBg', url); document.getElementById('mainBody').style.backgroundImage = `url('${url}')`; }
+            document.getElementById('adminPanel').classList.add('hidden');
+        }
+        function toggleModal(id) { const m = document.getElementById(id); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
+        function closeRequestModal() { toggleModal('requestModal'); resetSearch(); }
+        function resetSearch() { document.getElementById('searchContainer').classList.remove('hidden'); document.getElementById('drillDownContainer').classList.add('hidden'); document.getElementById('movieSearch').value = ""; document.getElementById('results').classList.add('hidden'); document.getElementById('statusMsg').classList.add('hidden'); }
+        function backToSeasons() { if(selectedShow) startTvFlow(selectedShow.id, selectedShow.title, selectedShow.year); }
     </script>
+</body>
+</html>
