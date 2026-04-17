@@ -16,7 +16,9 @@
     <script>
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_TOKEN = '5msRNVbv92Z_oVfyBcrv';
-        const PLEX_URL = 'http://plex.tarankurtz.com:32400/web'; 
+        
+        // Using app.plex.tv provides a guaranteed HTTPS experience
+        const PLEX_URL = 'https://app.plex.tv/desktop'; 
         const HFS_URL = 'https://transfer.tarankurtz.com:8443'; 
         const ADMIN_PASS = 'Potatoes2!'; 
     </script>
@@ -32,7 +34,7 @@
                 <svg class="w-6 h-6 text-zinc-400 group-hover:text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.9 3.47-2.1 4.64-1.2 1.16-2.76 1.84-5.74 1.84-4.8 0-8.59-3.92-8.59-8.68s3.79-8.68 8.59-8.68c2.4 0 4.2 1 5.56 2.32l2.32-2.32C18.44 1.34 15.68 0 12.48 0 5.8 0 0 5.38 0 12s5.8 12 12.48 12c3.52 0 6.16-1.16 8.32-3.4 2.24-2.24 2.96-5.44 2.96-8.08 0-.64-.08-1.28-.16-1.92h-11.12z"/></svg>
             </button>
 
-            <button onclick="doSearch('ai')" class="ml-1 p-3 bg-blue-600 hover:bg-blue-500 rounded-full transition-all shadow-lg group" title="Ask AI (Gemini)">
+            <button onclick="doSearch('ai')" class="ml-1 p-3 bg-blue-600 hover:bg-blue-500 rounded-full transition-all shadow-lg group" title="Ask AI">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </button>
         </div>
@@ -93,7 +95,6 @@
     </footer>
 
     <script>
-        // --- SEARCH LOGIC ---
         function doSearch(type) {
             const query = document.getElementById('mainSearch').value;
             if (!query) return;
@@ -104,12 +105,10 @@
             }
         }
         
-        // Listen for "Enter" key in the search bar
         document.getElementById('mainSearch').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') doSearch('google');
         });
 
-        // --- THE REST OF THE PORTAL LOGIC (REQUESTS/ADMIN) ---
         let adminMode = false;
         let selectedShow = null;
 
@@ -221,6 +220,7 @@
                 return;
             }
             try {
+                // Keep checking the specific local port for library matching
                 const plexRes = await fetch(`http://plex.tarankurtz.com:32400/search?query=${encodeURIComponent(title)}&X-Plex-Token=${PLEX_TOKEN}`);
                 const text = await plexRes.text();
                 if (text.includes(title) && tag === "") {
