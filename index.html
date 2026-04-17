@@ -37,7 +37,7 @@
             opacity: 1; visibility: visible; transform: translateX(-50%) translateY(-10px); 
         }
 
-        .brand-icon { width: 32px; height: 32px; object-fit: contain; margin-bottom: 8px; }
+        .brand-icon { width: 40px; height: 40px; object-fit: contain; margin-bottom: 8px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
 
         .modal-fixed-height { height: 500px; display: flex; flex-direction: column; }
     </style>
@@ -48,7 +48,7 @@
         const TITLE_HEADERS = ["Taran's Terminal", "Taran's Transit", "Kiki's Kiosk", "Kiki's Kingdom", "Taran's Portal"];
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_URL = 'http://plex.tarankurtz.com:32400'; 
-        const NAS_IP = 'http://192.168.1.69'; // For Status Check
+        const PLEX_STATUS_URL = 'http://192.168.1.69:32400/web/favicon.ico'; // Pinging a specific file works better
         const NAS_SETTINGS_URL = 'http://107.220.202.150:8000/';
         const HFS_URL = 'https://transfer.tarankurtz.com:8443'; 
         const ADMIN_PASS = 'Potatoes2!'; 
@@ -74,35 +74,35 @@
         
         <div onclick="window.location.href=HFS_URL" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-blue-500">
             <div id="hfsStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-500 italic">Checking...</div>
-            <div class="text-2xl mb-1">📂</div>
+            <div class="text-3xl mb-1">📂</div>
             <div class="text-[11px] uppercase tracking-widest font-bold">Files</div>
             <div class="absolute bottom-2 opacity-60 text-[8px] font-bold uppercase tracking-tighter text-zinc-400">Guest: 1234</div>
         </div>
 
         <div onclick="window.open(PLEX_URL, '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-orange-500">
             <div id="plexStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-500 italic">Checking...</div>
-            <img src="https://www.plex.tv/wp-content/uploads/2022/01/plex-icon-symbol-1.png" class="brand-icon" alt="Plex">
+            <img src="https://www.plex.tv/wp-content/uploads/2023/12/plex-icon-chevron-gold.png" class="brand-icon" alt="Plex">
             <div class="text-[11px] uppercase tracking-widest font-bold">Plex</div>
             <span onclick="event.stopPropagation(); requestPlexAccess();" class="absolute bottom-2 text-[8px] text-zinc-500 underline uppercase hover:text-orange-400 z-50">Request Access</span>
         </div>
 
         <div onclick="window.open('https://youtube.com', '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-red-600">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/e/ef/Youtube_logo.png" class="brand-icon" style="width: 40px;" alt="YouTube">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="brand-icon" alt="YouTube">
             <div class="text-[11px] uppercase tracking-widest font-bold">YouTube</div>
         </div>
 
         <div onclick="window.open('https://remotedesktop.google.com/access', '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-blue-400">
-            <img src="https://fonts.gstatic.com/s/i/productlogos/chrome_remote_desktop/v7/web-96dp/logo_chrome_remote_desktop_color_96dp.png" class="brand-icon" alt="Remote">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/Logo_Chrome_Remote_Desktop.png" class="brand-icon" alt="Remote">
             <div class="text-[11px] uppercase tracking-widest font-bold">Remote</div>
         </div>
 
         <div onclick="window.open(NAS_SETTINGS_URL, '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-zinc-400">
-            <div class="text-2xl mb-1">⚙️</div>
+            <div class="text-3xl mb-1">⚙️</div>
             <div class="text-[11px] uppercase tracking-widest font-bold text-center px-2">NAS Settings</div>
         </div>
 
         <div onclick="toggleModal('requestModal')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-emerald-500">
-            <div class="text-2xl mb-1">📥</div>
+            <div class="text-3xl mb-1">📥</div>
             <div class="text-[11px] uppercase tracking-widest font-bold">Request</div>
             <span onclick="event.stopPropagation(); openListView();" class="absolute bottom-2 text-[9px] text-zinc-600 underline uppercase tracking-widest hover:text-white z-50">View List</span>
         </div>
@@ -124,7 +124,6 @@
                 </div>
             </div>
             <div id="statusMsg" class="mt-4 p-3 rounded-xl text-center text-sm hidden font-bold"></div>
-            <button onclick="closeRequestModal(); openListView();" class="mt-4 w-full py-2 bg-zinc-800/50 border border-zinc-700 rounded-lg text-[10px] text-zinc-400 hover:text-emerald-400 uppercase tracking-widest">Open Queue</button>
         </div>
     </div>
 
@@ -162,9 +161,14 @@
         })();
 
         async function checkOnlineStatus() {
+            // HFS Check
             fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('hfsStatus', true)).catch(() => setStatus('hfsStatus', false));
-            // Ping NAS IP directly as requested
-            fetch(NAS_IP, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('plexStatus', true)).catch(() => setStatus('plexStatus', false));
+            
+            // Plex Check (Loading an image is a more reliable "ping" for local servers)
+            const img = new Image();
+            img.onload = () => setStatus('plexStatus', true);
+            img.onerror = () => setStatus('plexStatus', false);
+            img.src = PLEX_STATUS_URL + "?t=" + new Date().getTime(); // Anti-cache
         }
 
         function setStatus(id, online) {
@@ -178,6 +182,7 @@
             window.location.href = type === 'google' ? `https://google.com/search?q=${encodeURIComponent(q)}` : `https://gemini.google.com/app?q=${encodeURIComponent(q)}`;
         }
 
+        // Rest of the TMDB/Modal logic from Iteration 58...
         document.getElementById('movieSearch').addEventListener('input', async (e) => {
             const val = e.target.value; if (val.length < 3) { document.getElementById('results').classList.add('hidden'); return; }
             const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&query=${val}`);
