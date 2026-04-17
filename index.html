@@ -3,46 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taran Kurtz | Home</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f0f0f; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .search-container { width: 90%; max-width: 600px; margin-bottom: 50px; }
-        input[type="text"] { width: 100%; padding: 18px; border-radius: 30px; border: 1px solid #333; background: #1a1a1a; color: white; font-size: 18px; outline: none; text-align: center; }
-        input[type="text"]:focus { border-color: #00b4ff; box-shadow: 0 0 10px #00b4ff; }
-        .links { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 20px; width: 90%; max-width: 700px; }
-        .card { background: #1a1a1a; padding: 25px; text-align: center; border-radius: 15px; text-decoration: none; color: white; font-weight: 500; border: 1px solid #333; transition: 0.3s; }
-        .card:hover { background: #252525; transform: translateY(-5px); border-color: #00b4ff; }
-        h1 { font-weight: 200; letter-spacing: 2px; margin-bottom: 40px; }
-    </style>
+    <title>Taran's Portal</title>
+    <script src="https://tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-center p-6">
 
-    <h1>TARAN KURTZ</h1>
+    <h1 class="text-4xl font-light tracking-widest mb-10">TARAN KURTZ</h1>
 
-    <div class="search-container">
-        <!-- Search Bar: Just type and hit enter for Google -->
-        <form action="https://google.com" method="get">
-            <input type="text" name="q" placeholder="Search Google or AI..." autofocus autocomplete="off">
+    <!-- Search Bar -->
+    <div class="w-full max-w-xl mb-12">
+        <form action="https://google.com" method="get" class="relative">
+            <input type="text" name="q" placeholder="Search Google or AI..." 
+                class="w-full bg-zinc-900 border border-zinc-800 rounded-full py-4 px-6 text-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-center">
         </form>
     </div>
 
-    <div class="links">
-        <!-- Your Home Server Links -->
-        <a href="http://tarankurtz.com" class="card">📁 Files</a>
-        <a href="http://tarankurtz.com" class="card">🎬 Requests</a>
-        <a href="https://plex.tv" class="card" target="_blank">🍿 Plex</a>
-        <a href="https://chatgpt.com" class="card" target="_blank">🤖 AI Chat</a>
+    <!-- Quick Links Grid -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-3xl mb-12">
+        <a href="http://tarankurtz.com" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
+            <div class="text-3xl mb-2">📂</div>
+            <div class="text-sm font-medium group-hover:text-blue-400">Files</div>
+        </a>
+        <a href="http://tarankurtz.com" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
+            <div class="text-3xl mb-2">🎬</div>
+            <div class="text-sm font-medium group-hover:text-blue-400">Overseerr</div>
+        </a>
+        <a href="https://plex.tv" target="_blank" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
+            <div class="text-3xl mb-2">🍿</div>
+            <div class="text-sm font-medium group-hover:text-blue-400">Plex</div>
+        </a>
+        <a href="https://openai.com" target="_blank" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
+            <div class="text-3xl mb-2">🤖</div>
+            <div class="text-sm font-medium group-hover:text-blue-400">AI Chat</div>
+        </a>
     </div>
+
+    <!-- Simple Request Form -->
+    <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl shadow-2xl">
+        <h2 class="text-xl font-semibold mb-6 text-center text-blue-400">🎬 Media Request</h2>
+        
+        <!-- Change the action URL to your Google Form or HFS upload link if needed -->
+        <form action="#" method="POST" class="space-y-4">
+            <div>
+                <input type="text" placeholder="Your Name" required
+                    class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 focus:outline-none focus:border-blue-500">
+            </div>
+            <div>
+                <input type="text" placeholder="Movie or TV Show Name" required
+                    class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 focus:outline-none focus:border-blue-500">
+            </div>
+            <button type="submit" 
+                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-colors shadow-lg shadow-blue-900/20">
+                Submit Request
+            </button>
+        </form>
+    </div>
+
+    <footer class="mt-20 text-zinc-600 text-xs tracking-widest uppercase">
+        Private Server &copy; 2026
+    </footer>
 
 </body>
 </html>
-
-<!-- Add this below your search bar -->
-<div class="request-box" style="margin-top: 20px; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333;">
-    <h3>🎬 Request a Movie/Show</h3>
-    <form action="YOUR_FORM_LINK_HERE">
-        <input type="text" placeholder="Your Name" style="margin-bottom: 10px;"><br>
-        <input type="text" placeholder="Movie or TV Show Name">
-        <button type="submit" style="margin-top: 10px; padding: 10px 20px; background: #00b4ff; color: white; border: none; border-radius: 5px; cursor: pointer;">Submit Request</button>
-    </form>
-</div>
