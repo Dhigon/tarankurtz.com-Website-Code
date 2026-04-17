@@ -23,11 +23,34 @@
         .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .dashboard-card { height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s ease; z-index: 20; }
         
-        #mainSearch { outline: none !important; box-shadow: none !important; border: none !important; background-color: transparent !important; color: white !important; }
+        /* Fixed Search Bar Transparency */
+        #mainSearch { 
+            outline: none !important; 
+            box-shadow: none !important; 
+            border: none !important; 
+            background: transparent !important; 
+            color: white !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+        }
 
-        /* Footer Help - Hover Only */
-        .help-content { opacity: 0; visibility: hidden; transform: translateY(10px); transition: all 0.3s ease; pointer-events: none; }
-        .help-trigger:hover .help-content { opacity: 1; visibility: visible; transform: translateY(0); }
+        /* Footer Help - Centered Hover Logic */
+        .help-content { 
+            opacity: 0; 
+            visibility: hidden; 
+            transform: translateY(10px); 
+            transition: all 0.3s ease; 
+            pointer-events: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+        }
+        .help-trigger:hover .help-content { 
+            opacity: 1; 
+            visibility: visible; 
+            transform: translateX(-50%) translateY(-10px); 
+        }
 
         .modal-fixed-height { height: 500px; display: flex; flex-direction: column; }
     </style>
@@ -55,7 +78,7 @@
             <input type="text" id="mainSearch" 
                    onkeydown="if(event.key==='Enter') doSearch('google')" 
                    placeholder="Search or ask AI..." 
-                   class="flex-1 bg-transparent py-2 px-6 text-base text-white outline-none">
+                   class="flex-1 py-2 px-6 text-base text-white">
             <button onclick="doSearch('ai')" class="p-2.5 bg-blue-600 hover:bg-blue-500 rounded-full text-white mr-1 transition-transform active:scale-95">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </button>
@@ -93,7 +116,6 @@
             <div class="text-[11px] uppercase tracking-widest font-bold">Request</div>
             <span onclick="event.stopPropagation(); openListView();" class="absolute bottom-2 text-[9px] text-zinc-600 underline uppercase tracking-widest hover:text-white z-50">View List</span>
         </div>
-
     </div>
 
     <div id="requestModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
@@ -125,10 +147,10 @@
         </div>
     </div>
 
-    <footer class="mt-16 flex flex-col items-center gap-6">
-        <div class="relative help-trigger">
+    <footer class="mt-16 flex flex-col items-center gap-6 relative">
+        <div class="help-trigger relative">
             <span class="text-zinc-600 text-[10px] tracking-[0.3em] cursor-help uppercase hover:text-zinc-400 transition-colors">Mobile App Setup</span>
-            <div class="help-content absolute bottom-full left-1/2 -translate-x-1/2 mb-4 w-64 bg-zinc-900 border border-zinc-800 p-4 rounded-2xl shadow-2xl z-50 text-center text-[9px] text-zinc-400">
+            <div class="help-content w-64 bg-zinc-900 border border-zinc-800 p-4 rounded-2xl shadow-2xl z-50 text-center text-[9px] text-zinc-400">
                 <strong>iOS:</strong> Share > Add to Home Screen<br><strong>Android:</strong> Menu (⋮) > Install App
             </div>
         </div>
@@ -150,34 +172,19 @@
         })();
 
         async function checkOnlineStatus() {
-            // HFS Check
-            fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' })
-                .then(() => setStatus('hfsStatus', true))
-                .catch(() => setStatus('hfsStatus', false));
-            
-            // Plex/NAS Check
-            fetch(NAS_PHYSICAL_IP, { mode: 'no-cors', cache: 'no-store' })
-                .then(() => setStatus('plexStatus', true))
-                .catch(() => setStatus('plexStatus', false));
+            fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('hfsStatus', true)).catch(() => setStatus('hfsStatus', false));
+            fetch(NAS_PHYSICAL_IP, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('plexStatus', true)).catch(() => setStatus('plexStatus', false));
         }
 
         function setStatus(id, online) {
             const el = document.getElementById(id);
-            if (el) {
-                el.innerHTML = online 
-                    ? `<span class="status-dot bg-green-500"></span> Online` 
-                    : `<span class="status-dot bg-red-500"></span> Offline`;
-            }
+            if (el) el.innerHTML = online ? `<span class="status-dot bg-green-500"></span> Online` : `<span class="status-dot bg-red-500"></span> Offline`;
         }
 
         function doSearch(type) {
             const q = document.getElementById('mainSearch').value;
             if (!q) return;
-            if (type === 'google') {
-                window.location.href = `https://google.com/search?q=${encodeURIComponent(q)}`;
-            } else {
-                window.location.href = `https://gemini.google.com/app?q=${encodeURIComponent(q)}`;
-            }
+            window.location.href = type === 'google' ? `https://google.com/search?q=${encodeURIComponent(q)}` : `https://gemini.google.com/app?q=${encodeURIComponent(q)}`;
         }
 
         document.getElementById('movieSearch').addEventListener('input', async (e) => {
@@ -240,12 +247,7 @@
         function closeRequestModal() { toggleModal('requestModal'); resetSearch(); }
         function resetSearch() { document.getElementById('movieSearch').value = ''; document.getElementById('searchContainer').classList.remove('hidden'); document.getElementById('drillDownContainer').classList.add('hidden'); document.getElementById('results').classList.add('hidden'); document.getElementById('statusMsg').classList.add('hidden'); selectedShow = null; }
         function backToSeasons() { if(selectedShow) startTvFlow(selectedShow.id, selectedShow.title, selectedShow.year); }
-        
-        function requestPlexAccess() { 
-            const email = prompt("Enter your Plex email:"); 
-            if (email) window.location.href = `mailto:taran.kurtz@gmail.com?subject=Plex Access Request&body=Requesting access for: ${email}`; 
-        }
-
+        function requestPlexAccess() { const email = prompt("Enter your Plex email:"); if (email) window.location.href = `mailto:taran.kurtz@gmail.com?subject=Plex Access Request&body=Requesting access for: ${email}`; }
         function renderRequests() {
             const list = document.getElementById('publicRequestList');
             const data = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
@@ -253,27 +255,9 @@
                 data.map(req => `<li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-800 text-[11px]"><span>${req.title}</span>${adminMode ? `<button onclick="removeReq(${req.id})" class="text-red-500 px-2 font-bold">✕</button>` : ''}</li>`).join('');
             if(adminMode) document.getElementById('adminListControls').classList.remove('hidden');
         }
-
-        function verifyAdmin() { 
-            if (prompt("Code:") === ADMIN_PASS) { 
-                adminMode = true; 
-                alert("Admin Mode Engaged");
-                renderRequests(); 
-            } 
-        }
-
-        function removeReq(id) { 
-            let data = JSON.parse(localStorage.getItem('mediaRequests') || '[]'); 
-            localStorage.setItem('mediaRequests', JSON.stringify(data.filter(r => r.id !== id))); 
-            renderRequests(); 
-        }
-
-        function clearAllRequests() { 
-            if(confirm("Clear everything?")) { 
-                localStorage.setItem('mediaRequests', '[]'); 
-                renderRequests(); 
-            } 
-        }
+        function verifyAdmin() { if (prompt("Code:") === ADMIN_PASS) { adminMode = true; renderRequests(); } }
+        function removeReq(id) { let data = JSON.parse(localStorage.getItem('mediaRequests') || '[]'); localStorage.setItem('mediaRequests', JSON.stringify(data.filter(r => r.id !== id))); renderRequests(); }
+        function clearAllRequests() { if(confirm("Clear everything?")) { localStorage.setItem('mediaRequests', '[]'); renderRequests(); } }
     </script>
 </body>
 </html>
