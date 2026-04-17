@@ -4,62 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Taran's Portal</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/10156/10156015.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
         .search-container:focus-within { border-color: #3b82f6; }
+        .bg-custom { background-size: cover; background-position: center; background-attachment: fixed; }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
     </style>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-center p-6 font-sans">
+<body id="mainBody" class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-center p-6 font-sans transition-all duration-500 bg-custom">
 
     <script>
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_TOKEN = '5msRNVbv92Z_oVfyBcrv';
-        
-        // Using app.plex.tv provides a guaranteed HTTPS experience
         const PLEX_URL = 'https://app.plex.tv/desktop'; 
         const HFS_URL = 'https://transfer.tarankurtz.com:8443'; 
         const ADMIN_PASS = 'Potatoes2!'; 
     </script>
 
-    <h1 class="text-4xl font-light tracking-widest mb-10 text-center uppercase">Taran Kurtz</h1>
+    <div class="text-center mb-2">
+        <p class="text-xs tracking-[0.3em] uppercase text-zinc-500 font-medium">taran.kurtz.com</p>
+        <p class="text-[10px] tracking-widest uppercase text-zinc-600 mb-6">- A Server for Friends and Family -</p>
+    </div>
+
+    <h1 id="editableTitle" class="text-4xl font-light tracking-widest mb-10 text-center uppercase">Taran Kurtz</h1>
 
     <div class="w-full max-w-2xl mb-12">
-        <div class="search-container flex items-center bg-zinc-900 border border-zinc-800 rounded-full px-2 py-2 transition-all shadow-xl">
+        <div class="search-container flex items-center bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded-full px-2 py-2 transition-all shadow-xl">
             <input type="text" id="mainSearch" placeholder="Search Google or ask AI..." 
                 class="flex-1 bg-transparent py-3 px-6 text-lg focus:outline-none text-white">
-            
-            <button onclick="doSearch('google')" class="p-3 hover:bg-zinc-800 rounded-full transition-colors group" title="Search Google">
+            <button onclick="doSearch('google')" class="p-3 hover:bg-zinc-800 rounded-full transition-colors group">
                 <svg class="w-6 h-6 text-zinc-400 group-hover:text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.9 3.47-2.1 4.64-1.2 1.16-2.76 1.84-5.74 1.84-4.8 0-8.59-3.92-8.59-8.68s3.79-8.68 8.59-8.68c2.4 0 4.2 1 5.56 2.32l2.32-2.32C18.44 1.34 15.68 0 12.48 0 5.8 0 0 5.38 0 12s5.8 12 12.48 12c3.52 0 6.16-1.16 8.32-3.4 2.24-2.24 2.96-5.44 2.96-8.08 0-.64-.08-1.28-.16-1.92h-11.12z"/></svg>
             </button>
-
-            <button onclick="doSearch('ai')" class="ml-1 p-3 bg-blue-600 hover:bg-blue-500 rounded-full transition-all shadow-lg group" title="Ask AI">
+            <button onclick="doSearch('ai')" class="ml-1 p-3 bg-blue-600 hover:bg-blue-500 rounded-full transition-all shadow-lg group">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </button>
         </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 w-full max-w-4xl mb-12">
-        <a href="javascript:void(0)" onclick="window.location.href=HFS_URL" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
-            <div class="text-3xl mb-2">📂</div>
-            <div class="text-sm font-medium group-hover:text-blue-400">Files</div>
-        </a>
+        <div class="flex flex-col items-center">
+            <div id="hfsStatus" class="text-[9px] uppercase tracking-tighter mb-1 text-zinc-500 italic">Checking...</div>
+            <a href="javascript:void(0)" onclick="window.location.href=HFS_URL" class="w-full group bg-zinc-900/90 border border-zinc-800 p-6 rounded-2xl text-center hover:border-blue-500 transition-all">
+                <div class="text-3xl mb-2">📂</div>
+                <div class="text-sm font-medium group-hover:text-blue-400">Files</div>
+            </a>
+        </div>
 
-        <a href="javascript:void(0)" onclick="window.open(PLEX_URL, '_blank')" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-orange-500 transition-all">
-            <div class="text-3xl mb-2">🎬</div>
-            <div class="text-sm font-medium group-hover:text-orange-400">Plex</div>
-        </a>
+        <div class="flex flex-col items-center">
+            <div id="plexStatus" class="text-[9px] uppercase tracking-tighter mb-1 text-zinc-500 italic">Checking...</div>
+            <div class="w-full group bg-zinc-900/90 border border-zinc-800 p-6 rounded-2xl text-center hover:border-orange-500 transition-all relative">
+                <a href="javascript:void(0)" onclick="window.open(PLEX_URL, '_blank')" class="block">
+                    <div class="text-3xl mb-2">🎬</div>
+                    <div class="text-sm font-medium group-hover:text-orange-400">Plex</div>
+                </a>
+                <a href="mailto:taran@tarankurtz.com?subject=Plex Access Request&body=Please add my Plex Email: " class="mt-3 block text-[10px] text-zinc-500 hover:text-white underline decoration-zinc-700">Request Access</a>
+            </div>
+        </div>
 
-        <button onclick="toggleModal('requestModal')" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-emerald-500 transition-all">
-            <div class="text-3xl mb-2">📥</div>
-            <div class="text-sm font-medium group-hover:text-emerald-400">Request</div>
-        </button>
+        <div class="flex flex-col items-center">
+            <div class="text-[9px] opacity-0 mb-1">.</div>
+            <button onclick="toggleModal('requestModal')" class="w-full group bg-zinc-900/90 border border-zinc-800 p-6 rounded-2xl text-center hover:border-emerald-500 transition-all">
+                <div class="text-3xl mb-2">📥</div>
+                <div class="text-sm font-medium group-hover:text-emerald-400">Request</div>
+            </button>
+        </div>
 
-        <button onclick="toggleModal('listModal')" class="group bg-zinc-900 border border-zinc-800 p-6 rounded-2xl text-center hover:border-yellow-500 transition-all">
-            <div class="text-3xl mb-2">📋</div>
-            <div class="text-sm font-medium group-hover:text-yellow-400">View List</div>
-        </button>
+        <div class="flex flex-col items-center">
+            <div class="text-[9px] opacity-0 mb-1">.</div>
+            <button onclick="toggleModal('listModal')" class="w-full group bg-zinc-900/90 border border-zinc-800 p-6 rounded-2xl text-center hover:border-yellow-500 transition-all">
+                <div class="text-3xl mb-2">📋</div>
+                <div class="text-sm font-medium group-hover:text-yellow-400">View List</div>
+            </button>
+        </div>
     </div>
 
     <div id="requestModal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center z-50 p-4">
@@ -90,33 +112,81 @@
         </div>
     </div>
 
+    <div id="adminPanel" class="fixed bottom-10 bg-zinc-900 border border-zinc-800 p-4 rounded-2xl hidden flex-col gap-4 shadow-2xl z-50">
+        <div class="text-xs font-bold text-zinc-500 uppercase tracking-widest">Admin Controls</div>
+        <input type="text" id="adminTitleIn" placeholder="Change Main Title..." class="bg-zinc-800 p-2 rounded text-xs border border-zinc-700">
+        <input type="text" id="adminBgIn" placeholder="Background Image URL..." class="bg-zinc-800 p-2 rounded text-xs border border-zinc-700">
+        <button onclick="saveAdminChanges()" class="bg-blue-600 text-[10px] font-bold py-2 rounded">Save & Apply</button>
+    </div>
+
     <footer onclick="verifyAdmin()" class="mt-20 text-zinc-700 text-xs tracking-widest uppercase cursor-pointer hover:text-zinc-500 transition-colors">
         Private Server &copy; 2026 | <span id="adminStatus">Admin Dashboard</span>
     </footer>
 
     <script>
+        // --- LOAD SETTINGS ---
+        window.onload = () => {
+            const savedTitle = localStorage.getItem('portalTitle') || 'Taran Kurtz';
+            const savedBg = localStorage.getItem('portalBg');
+            document.getElementById('editableTitle').innerText = savedTitle;
+            if(savedBg) document.getElementById('mainBody').style.backgroundImage = `url('${savedBg}')`;
+            checkOnlineStatus();
+        };
+
+        // --- STATUS CHECKER ---
+        async function checkOnlineStatus() {
+            // HFS Check
+            try { await fetch(HFS_URL, { mode: 'no-cors' }); setStatus('hfsStatus', true); } 
+            catch { setStatus('hfsStatus', false); }
+            // Plex Check
+            try { await fetch('http://plex.tarankurtz.com:32400/identity', { mode: 'no-cors' }); setStatus('plexStatus', true); } 
+            catch { setStatus('plexStatus', false); }
+        }
+
+        function setStatus(id, online) {
+            const el = document.getElementById(id);
+            el.innerHTML = online ? `<span class="status-dot bg-green-500"></span> Online` : `<span class="status-dot bg-red-500"></span> Offline`;
+        }
+
+        // --- ADMIN MODE ---
+        let adminMode = false;
+        function verifyAdmin() {
+            if (adminMode) { 
+                adminMode = false; 
+                document.getElementById('adminStatus').innerText = "Admin Dashboard"; 
+                document.getElementById('adminPanel').classList.add('hidden');
+                return; 
+            }
+            const pass = prompt("Enter Admin Code:");
+            if (pass === ADMIN_PASS) { 
+                adminMode = true; 
+                document.getElementById('adminStatus').innerText = "ADMIN MODE: ON"; 
+                document.getElementById('adminPanel').classList.remove('hidden');
+                document.getElementById('adminPanel').classList.add('flex');
+            }
+        }
+
+        function saveAdminChanges() {
+            const newTitle = document.getElementById('adminTitleIn').value;
+            const newBg = document.getElementById('adminBgIn').value;
+            if(newTitle) {
+                localStorage.setItem('portalTitle', newTitle);
+                document.getElementById('editableTitle').innerText = newTitle;
+            }
+            if(newBg) {
+                localStorage.setItem('portalBg', newBg);
+                document.getElementById('mainBody').style.backgroundImage = `url('${newBg}')`;
+            }
+            alert("Settings updated!");
+        }
+
+        // --- SEARCH & UI ---
         function doSearch(type) {
             const query = document.getElementById('mainSearch').value;
             if (!query) return;
-            if (type === 'google') {
-                window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-            } else {
-                window.location.href = `https://gemini.google.com/app?q=${encodeURIComponent(query)}`;
-            }
+            window.location.href = type === 'google' ? `https://google.com/search?q=${encodeURIComponent(query)}` : `https://gemini.google.com/app?q=${encodeURIComponent(query)}`;
         }
-        
-        document.getElementById('mainSearch').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') doSearch('google');
-        });
-
-        let adminMode = false;
-        let selectedShow = null;
-
-        function verifyAdmin() {
-            if (adminMode) { adminMode = false; document.getElementById('adminStatus').innerText = "Admin Dashboard"; renderRequests(); return; }
-            const pass = prompt("Enter Admin Code:");
-            if (pass === ADMIN_PASS) { adminMode = true; document.getElementById('adminStatus').innerText = "ADMIN MODE: ON"; renderRequests(); }
-        }
+        document.getElementById('mainSearch').addEventListener('keypress', (e) => { if (e.key === 'Enter') doSearch('google'); });
 
         function toggleModal(id) {
             const m = document.getElementById(id);
@@ -129,13 +199,15 @@
         function resetSearch() {
             document.getElementById('searchContainer').classList.remove('hidden');
             document.getElementById('drillDownContainer').classList.add('hidden');
-            document.getElementById('backToSeasonBtn').classList.add('hidden');
+            document.getElementById('backToSeasonBtn').classList.add('hidden'); // Fixed: Back button disappears on reset
             document.getElementById('modalTitle').innerText = "Request Media";
             document.getElementById('movieSearch').value = "";
             document.getElementById('results').innerHTML = "";
             document.getElementById('statusMsg').classList.add('hidden');
         }
 
+        // --- MEDIA REQUEST LOGIC ---
+        let selectedShow = null;
         const searchInput = document.getElementById('movieSearch');
         const resultsDiv = document.getElementById('results');
 
@@ -166,16 +238,12 @@
             selectedShow = { id, title, year };
             document.getElementById('searchContainer').classList.add('hidden');
             document.getElementById('drillDownContainer').classList.remove('hidden');
+            document.getElementById('backToSeasonBtn').classList.add('hidden'); // Fixed: Hidden until inside seasons
             document.getElementById('modalTitle').innerText = "Select Detail";
             const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}`);
             const data = await res.json();
             const drillDiv = document.getElementById('drillDownResults');
-            drillDiv.innerHTML = '';
-            const showBtn = document.createElement('div');
-            showBtn.className = 'p-4 bg-emerald-600/30 hover:bg-emerald-600 cursor-pointer border-b border-emerald-500/50 text-center font-bold text-white';
-            showBtn.innerText = "Request Entire Series";
-            showBtn.onclick = () => runVerification(title, year, "", "TV");
-            drillDiv.appendChild(showBtn);
+            drillDiv.innerHTML = `<div class="p-4 bg-emerald-600/30 hover:bg-emerald-600 cursor-pointer border-b border-emerald-500/50 text-center font-bold text-white" onclick="runVerification('${title}', '${year}', '', 'TV')">Request Entire Series</div>`;
             data.seasons.forEach(s => {
                 const div = document.createElement('div');
                 div.className = 'p-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-700';
@@ -186,7 +254,7 @@
         }
 
         function showEpisodeOptions(sNum, epCount) {
-            document.getElementById('backToSeasonBtn').classList.remove('hidden');
+            document.getElementById('backToSeasonBtn').classList.remove('hidden'); // Fixed: Back button appears only when deep in episodes
             const drillDiv = document.getElementById('drillDownResults');
             const sPad = sNum.toString().padStart(2, '0');
             drillDiv.innerHTML = `<div class="p-4 bg-blue-900/20 text-blue-400 text-center font-bold border-b border-blue-900/50">Season ${sNum}</div>`;
@@ -220,7 +288,6 @@
                 return;
             }
             try {
-                // Keep checking the specific local port for library matching
                 const plexRes = await fetch(`http://plex.tarankurtz.com:32400/search?query=${encodeURIComponent(title)}&X-Plex-Token=${PLEX_TOKEN}`);
                 const text = await plexRes.text();
                 if (text.includes(title) && tag === "") {
