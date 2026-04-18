@@ -119,35 +119,35 @@
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full mb-12">
             
             <!-- HFS Files Card -->
-            <div onclick="window.location.href=HFS_URL" class="dashboard-card rounded-2xl hover:border-blue-500">
+            <div onclick="handleLink(event, HFS_URL)" onauxclick="handleLink(event, HFS_URL)" class="dashboard-card rounded-2xl hover:border-blue-500">
                 <div id="hfsStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-400 italic">Checking...</div>
                 <div class="text-3xl mb-1 drop-shadow-md">📂</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Files</div>
             </div>
 
             <!-- Plex Media Card -->
-            <div onclick="window.location.href=PLEX_URL" class="dashboard-card rounded-2xl hover:border-orange-500">
+            <div onclick="handleLink(event, PLEX_URL)" onauxclick="handleLink(event, PLEX_URL)" class="dashboard-card rounded-2xl hover:border-orange-500">
                 <div id="plexStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-400 italic">Checking...</div>
                 <div class="text-3xl mb-1 drop-shadow-md">🎬</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Plex</div>
-                <!-- Independent Request Access Link -->
-                <span onclick="event.stopPropagation(); requestPlexAccess();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-orange-400 z-50 transition-colors">Request Access</span>
+                <!-- Independent Request Access Link - Stop propagation allows the modal trigger to work without clicking the parent card -->
+                <span onclick="event.stopPropagation(); requestPlexAccess();" onauxclick="event.stopPropagation();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-orange-400 z-50 transition-colors">Request Access</span>
             </div>
 
             <!-- YouTube Card -->
-            <div onclick="window.location.href='https://youtube.com'" class="dashboard-card rounded-2xl hover:border-red-600">
+            <div onclick="handleLink(event, 'https://youtube.com')" onauxclick="handleLink(event, 'https://youtube.com')" class="dashboard-card rounded-2xl hover:border-red-600">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="brand-icon drop-shadow-md" alt="YouTube">
                 <div class="text-[11px] uppercase tracking-widest font-bold">YouTube</div>
             </div>
 
             <!-- Google Remote Desktop Card -->
-            <div onclick="window.location.href='https://remotedesktop.google.com/access'" class="dashboard-card rounded-2xl hover:border-blue-400">
+            <div onclick="handleLink(event, 'https://remotedesktop.google.com/access')" onauxclick="handleLink(event, 'https://remotedesktop.google.com/access')" class="dashboard-card rounded-2xl hover:border-blue-400">
                 <div class="text-3xl mb-1 drop-shadow-md">🖥️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Remote</div>
             </div>
 
             <!-- NAS Settings Card -->
-            <div onclick="window.location.href=NAS_SETTINGS_URL" class="dashboard-card rounded-2xl hover:border-zinc-400">
+            <div onclick="handleLink(event, NAS_SETTINGS_URL)" onauxclick="handleLink(event, NAS_SETTINGS_URL)" class="dashboard-card rounded-2xl hover:border-zinc-400">
                 <div class="text-3xl mb-1 drop-shadow-md">⚙️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-2">NAS Settings</div>
             </div>
@@ -175,7 +175,7 @@
             
             <!-- Step 1: Initial Search Input -->
             <div id="searchContainer" class="flex flex-col flex-1 overflow-hidden">
-                <input type="text" id="movieSearch" placeholder="Search Movie/TV..." class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-emerald-500 transition-colors">
+                <input type="text" id="movieSearch" placeholder="Search Movie/TV/Person..." class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-emerald-500 transition-colors">
                 <div id="results" class="mt-4 bg-zinc-800/80 border border-zinc-700 rounded-xl hidden overflow-y-auto"></div>
             </div>
 
@@ -206,6 +206,11 @@
             <!-- List Container -->
             <ul id="publicRequestList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
             
+            <!-- Toggle between Media and Persons -->
+            <button id="toggleActorBtn" onclick="toggleActorView()" class="w-full bg-zinc-800/50 hover:bg-zinc-700 border border-zinc-700/50 py-3 rounded-xl text-[10px] text-zinc-400 hover:text-white uppercase tracking-widest transition-colors mb-4">
+                Favorite Actors to Watch
+            </button>
+
             <!-- Admin Only: Clear All Controls -->
             <div id="adminListControls" class="hidden">
                 <button onclick="clearAllRequests()" class="w-full bg-red-900/30 hover:bg-red-900/50 text-red-500 py-3 rounded-xl text-[10px] border border-red-900/50 uppercase transition-colors">Clear All</button>
@@ -243,9 +248,9 @@
         <div class="flex flex-col items-center gap-3">
             <button onclick="verifyAdmin()" id="adminBtn" class="text-zinc-600 text-[9px] tracking-[0.4em] uppercase hover:text-zinc-400 transition-colors py-2 px-4 rounded-lg hover:bg-zinc-800/30">Admin Portal</button>
             <div id="adminControls" class="hidden flex flex-wrap justify-center gap-4 mt-2">
-                <button onclick="window.location.href=GITHUB_CODE_URL" class="text-emerald-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-emerald-400 hover:underline transition-all">Website Code</button>
-                <button onclick="window.location.href=ROUTER_URL" class="text-blue-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-blue-400 hover:underline transition-all">Router</button>
-                <button onclick="window.location.href=CLOUDFLARE_URL" class="text-orange-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-orange-400 hover:underline transition-all">CloudFlare</button>
+                <button onclick="handleLink(event, GITHUB_CODE_URL, true)" onauxclick="handleLink(event, GITHUB_CODE_URL, true)" class="text-emerald-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-emerald-400 hover:underline transition-all">Website Code</button>
+                <button onclick="handleLink(event, ROUTER_URL, true)" onauxclick="handleLink(event, ROUTER_URL, true)" class="text-blue-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-blue-400 hover:underline transition-all">Router</button>
+                <button onclick="handleLink(event, CLOUDFLARE_URL, true)" onauxclick="handleLink(event, CLOUDFLARE_URL, true)" class="text-orange-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-orange-400 hover:underline transition-all">CloudFlare</button>
             </div>
         </div>
     </footer>
@@ -256,6 +261,7 @@
     <script>
         let adminMode = false; 
         let selectedShow = null;
+        let viewingActors = false; // Tracks if we are viewing the Actor list vs the standard Media list
 
         /**
          * Initialize application: Sets up a rotating title based on a timestamp and starts status checks.
@@ -274,9 +280,47 @@
         })();
 
         /**
+         * Global Escape Key Listener
+         * Checks for Esc keypress and forcefully closes UI popups
+         */
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const rModal = document.getElementById('requestModal');
+                const lModal = document.getElementById('listModal');
+                
+                if (!rModal.classList.contains('hidden')) {
+                    closeRequestModal();
+                }
+                if (!lModal.classList.contains('hidden')) {
+                    lModal.classList.add('hidden');
+                    lModal.classList.remove('flex');
+                }
+            }
+        });
+
+        /**
+         * Enhanced Link Click Handler
+         * Allows left click to follow behavior, and middle clicks to open in a new tab.
+         * Admin links can force left clicks to open in a new tab as well.
+         */
+        function handleLink(e, url, forceNewTab = false) {
+            // Button 0 = Left click
+            if (e.type === 'click' && e.button === 0) {
+                if (forceNewTab || e.ctrlKey || e.metaKey) {
+                    window.open(url, '_blank');
+                } else {
+                    window.location.href = url;
+                }
+            } 
+            // Button 1 = Middle click (caught by onauxclick event)
+            else if (e.type === 'auxclick' && e.button === 1) {
+                window.open(url, '_blank');
+            }
+        }
+
+        /**
          * Custom Dialog Handler
          * Replaces native alert(), prompt(), and confirm() to adhere to iFrame safety rules.
-         * Returns a Promise resolving to the user input (for prompt), boolean (for confirm), or true (for alert).
          */
         function showCustomDialog(type, message, placeholder = "") {
             return new Promise((resolve) => {
@@ -328,7 +372,6 @@
 
         /**
          * Health checks for critical servers.
-         * Fetches URLs in no-cors mode and updates the UI status indicators.
          */
         async function checkOnlineStatus() {
             fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' })
@@ -354,7 +397,6 @@
 
         /**
          * Search Engine Handler
-         * Redirects user input to either Google Search or Google Gemini AI.
          */
         function doSearch(type) {
             const q = document.getElementById('mainSearch').value;
@@ -390,13 +432,23 @@
                     const year = (item.release_date || item.first_air_date || '').split('-')[0];
                     const div = document.createElement('div'); 
                     
-                    div.className = 'p-3 hover:bg-zinc-700/80 cursor-pointer border-b border-zinc-700/50 text-xs transition-colors';
-                    div.innerHTML = `<b>${title}</b> (${year}) <span class="text-[10px] text-zinc-500 uppercase ml-2">${item.media_type}</span>`;
+                    div.className = 'p-3 hover:bg-zinc-700/80 cursor-pointer border-b border-zinc-700/50 text-xs transition-colors flex justify-between items-center';
+                    
+                    // Do not show the year parenthesis for persons
+                    const yearDisplay = (year && item.media_type !== 'person') ? `(${year})` : '';
+                    div.innerHTML = `<span><b>${title}</b> ${yearDisplay}</span> <span class="text-[9px] font-bold text-zinc-500 uppercase">${item.media_type}</span>`;
                     
                     // Route click depending on media type
-                    div.onclick = () => item.media_type === 'tv' 
-                        ? startTvFlow(item.id, title, year) 
-                        : runVerification(title, year, "", "MOVIE");
+                    div.onclick = () => {
+                        if (item.media_type === 'tv') {
+                            startTvFlow(item.id, title, year);
+                        } else if (item.media_type === 'person') {
+                            // Leave year/tag blank, assign type PERSON
+                            runVerification(title, "", "", "PERSON");
+                        } else {
+                            runVerification(title, year, "", "MOVIE");
+                        }
+                    };
                         
                     results.appendChild(div);
                 });
@@ -455,7 +507,12 @@
          * Validates and saves the final media request to localStorage.
          */
         function runVerification(title, year, tag, type) {
-            const entry = `${title} (${year}) ${tag} - ${type}`.trim();
+            // Build the string smartly depending on empty parameters
+            let entry = title;
+            if (year && type !== 'PERSON') entry += ` (${year})`; // Final sanity check to avoid year on persons
+            if (tag) entry += ` ${tag}`;
+            entry += ` - ${type}`;
+
             const msg = document.getElementById('statusMsg');
             let list = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
             
@@ -495,7 +552,8 @@
          * Closes Request Modal and resets form state.
          */
         function closeRequestModal() { 
-            toggleModal('requestModal'); 
+            document.getElementById('requestModal').classList.add('hidden');
+            document.getElementById('requestModal').classList.remove('flex');
             resetSearch(); 
         }
 
@@ -520,7 +578,6 @@
 
         /**
          * Handles the "Request Access" action on the Plex card.
-         * Now uses custom dialogue implementation.
          */
         async function requestPlexAccess() { 
             const email = await showCustomDialog('prompt', 'Enter your Plex email:', 'username@domain.com');
@@ -530,21 +587,40 @@
         }
         
         /**
-         * Renders the queued media requests into the UI.
+         * Toggles the UI state between Viewing Media and Viewing Actors
+         */
+        function toggleActorView() {
+            viewingActors = !viewingActors;
+            renderRequests();
+        }
+
+        /**
+         * Renders the queued media requests into the UI based on filter state.
          */
         function renderRequests() {
             const list = document.getElementById('publicRequestList');
+            const toggleBtn = document.getElementById('toggleActorBtn');
             const data = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
             
-            list.innerHTML = data.length === 0 
-                ? '<li class="text-zinc-500 italic text-center text-xs py-10">Queue is empty</li>' 
-                : data.map(req => `
+            // Filter data based on if we are currently looking at "Persons" or standard "Media"
+            const filteredData = data.filter(req => 
+                viewingActors ? req.title.endsWith('- PERSON') : !req.title.endsWith('- PERSON')
+            );
+            
+            // Toggle Button Text Updater
+            toggleBtn.innerText = viewingActors ? "View Standard Media Queue" : "Favorite Actors to Watch";
+
+            // Render List Items
+            list.innerHTML = filteredData.length === 0 
+                ? `<li class="text-zinc-500 italic text-center text-xs py-10">${viewingActors ? 'No favorite actors added yet.' : 'Queue is empty.'}</li>` 
+                : filteredData.map(req => `
                     <li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-700/50 text-[11px] shadow-sm">
                         <span>${req.title}</span>
-                        ${adminMode ? `<button onclick="removeReq(${req.id})" class="text-red-500/80 hover:text-red-400 px-2 font-bold transition-colors">✕</button>` : ''}
+                        <!-- Anyone can now delete individual requests -->
+                        <button onclick="removeReq(${req.id})" class="text-red-500/80 hover:text-red-400 px-2 font-bold transition-colors">✕</button>
                     </li>`).join('');
             
-            // Unhide admin controls if admin mode is toggled
+            // Unhide admin controls if admin mode is toggled (Needed for Clear All functionality)
             if(adminMode) {
                 document.getElementById('adminListControls').classList.remove('hidden');
                 document.getElementById('adminControls').classList.remove('hidden');
@@ -555,7 +631,7 @@
         }
 
         /**
-         * Secures Admin Functions using a prompt (Replaced with Custom Dialog).
+         * Secures Admin Functions using custom dialog.
          */
         async function verifyAdmin() { 
             const pass = await showCustomDialog('prompt', 'Enter Admin Code:', 'Password...');
