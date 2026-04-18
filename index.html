@@ -12,17 +12,21 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Custom Scrollbar Styles */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
         
+        /* Main Body Background */
         #mainBody { 
             background-image: url('https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/background-1.jpg');
             background-size: cover; background-position: center; background-attachment: fixed; background-color: #09090b;
         }
 
+        /* Dashboard Components */
         .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .dashboard-card { height: 140px; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; cursor: pointer; transition: all 0.2s ease; z-index: 20; }
         
+        /* Search Input Overrides */
         #mainSearch, #mainSearch:focus, #mainSearch:active, #mainSearch:-webkit-autofill { 
             outline: none !important; box-shadow: none !important; border: none !important; 
             background: transparent !important; background-color: transparent !important;
@@ -30,13 +34,10 @@
             transition: background-color 5000s ease-in-out 0s; appearance: none !important; 
         }
 
-        .help-content { 
-            opacity: 0; visibility: hidden; transition: all 0.3s ease; pointer-events: none;
-            position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%) translateY(10px);
-        }
-        .help-trigger:hover .help-content { 
-            opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0px); 
-        }
+        /* Help Tooltip */
+        .help-content { opacity: 0; visibility: hidden; transition: all 0.3s ease; pointer-events: none;
+            position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%) translateY(10px); }
+        .help-trigger:hover .help-content { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0px); }
 
         .brand-icon { width: 42px; height: 42px; object-fit: contain; margin-bottom: 8px; }
         .modal-fixed-height { height: 520px; display: flex; flex-direction: column; }
@@ -158,9 +159,10 @@
     </footer>
 
     <script>
-        let adminMode = false; let selectedShow = null;
+        let adminMode = false;
+        let selectedShow = null;
 
-        // Title rotation logic (15 minute interval)
+        // Title rotation logic
         (function init() {
             const lastUpdate = parseInt(localStorage.getItem('portal_last_title_update') || 0);
             const now = Date.now();
@@ -262,8 +264,7 @@
         function renderRequests() {
             const list = document.getElementById('publicRequestList');
             const data = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
-            list.innerHTML = data.length === 0 ? '<li class="text-zinc-600 italic text-center text-xs py-10">Queue is empty</li>' :
-                data.map(req => `<li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-800 text-[11px]"><span>${req.title}</span>${adminMode ? `<button onclick="removeReq(${req.id})" class="text-red-500 px-2 font-bold">✕</button>` : ''}</li>`).join('');
+            list.innerHTML = data.length === 0 ? '<li class="text-zinc-600 italic text-center text-xs py-10">Queue is empty</li>' : data.map(req => `<li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-800 text-[11px]"><span>${req.title}</span>${adminMode ? `<button onclick="removeReq(${req.id})" class="text-red-500 px-2 font-bold">✕</button>` : ''}</li>`).join('');
             if(adminMode) {
                 document.getElementById('adminListControls').classList.remove('hidden');
                 document.getElementById('adminControls').classList.remove('hidden');
