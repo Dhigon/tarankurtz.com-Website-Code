@@ -48,7 +48,6 @@
         const TITLE_HEADERS = ["Taran's Terminal", "Taran's Transit", "Kiki's Kiosk", "Kiki's Kingdom", "Taran's Portal"];
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_URL = 'http://plex.tarankurtz.com:32400'; 
-        const NAS_IP_ONLY = 'http://192.168.1.69:32400'; 
         const NAS_SETTINGS_URL = 'http://107.220.202.150:8000/';
         const HFS_URL = 'https://transfer.tarankurtz.com:8443'; 
         const ADMIN_PASS = 'Potatoes2!'; 
@@ -109,180 +108,28 @@
         </div>
     </main>
 
-    <div id="requestModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
-        <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative modal-fixed-height shadow-2xl">
-            <button onclick="closeRequestModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
-            <h2 class="text-xl font-semibold mb-6 text-center text-emerald-400 uppercase tracking-widest">Media Request</h2>
-            <div id="searchContainer" class="flex flex-col flex-1 overflow-hidden">
-                <input type="text" id="movieSearch" placeholder="Search Movie/TV..." class="w-full bg-zinc-800 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none">
-                <div id="results" class="mt-4 bg-zinc-800 border border-zinc-700 rounded-xl hidden overflow-y-auto"></div>
-            </div>
-            <div id="drillDownContainer" class="hidden flex flex-col flex-1 overflow-hidden">
-                <div id="drillDownResults" class="bg-zinc-800 border border-zinc-700 rounded-xl overflow-y-auto flex-1"></div>
-                <div class="flex gap-2 mt-4">
-                    <button id="backToSeasonBtn" onclick="backToSeasons()" class="hidden flex-1 py-2 text-xs text-blue-400 border border-blue-900/50 rounded-lg uppercase">← Back</button>
-                    <button onclick="resetSearch()" class="flex-1 py-2 text-xs text-red-500 border border-red-900/40 rounded-lg uppercase">Restart</button>
-                </div>
-            </div>
-            <div id="statusMsg" class="mt-4 p-3 rounded-xl text-center text-sm hidden font-bold"></div>
-            <button onclick="closeRequestModal(); openListView();" class="mt-auto w-full py-3 bg-zinc-800/50 border border-zinc-700 rounded-xl text-[10px] text-zinc-400 hover:text-emerald-400 uppercase tracking-widest transition-colors">Open Request Queue</button>
-        </div>
-    </div>
-
-    <div id="listModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
-        <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative flex flex-col modal-fixed-height shadow-2xl">
-            <button onclick="toggleModal('listModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
-            <h2 class="text-xl font-semibold mb-6 text-center text-yellow-400 uppercase tracking-widest">Current Queue</h2>
-            <ul id="publicRequestList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
-            <div id="adminListControls" class="hidden"><button onclick="clearAllRequests()" class="w-full bg-red-900/30 text-red-500 py-3 rounded-xl text-[10px] border border-red-900/50 uppercase">Clear All</button></div>
-        </div>
-    </div>
-
-    <footer class="mt-auto py-10 w-full flex flex-col items-center gap-6 z-50">
-        <div class="help-trigger relative group">
-            <span class="text-zinc-600 text-[10px] tracking-[0.3em] cursor-help uppercase hover:text-zinc-400 transition-colors">Mobile App Setup</span>
-            <div class="help-content w-64 bg-zinc-900/95 border border-zinc-800 p-4 rounded-2xl shadow-2xl text-center text-[9px] text-zinc-400 backdrop-blur-md">
-                <strong>iOS:</strong> Share > Add to Home Screen<br><strong>Android:</strong> Menu (⋮) > Install App
-            </div>
-        </div>
-        
-        <div class="flex flex-col items-center gap-3">
-            <button onclick="verifyAdmin()" id="adminBtn" class="text-zinc-800 text-[9px] tracking-[0.4em] uppercase hover:text-zinc-500 transition-colors py-2 px-4">
-                Admin Portal
-            </button>
-            <button id="codeLink" onclick="window.location.href=GITHUB_CODE_URL" class="hidden text-emerald-600/60 text-[8px] tracking-[0.2em] uppercase hover:text-emerald-400 underline transition-colors">
-                Website Code
-            </button>
-        </div>
-    </footer>
-
     <script>
-        let adminMode = false; let selectedShow = null;
-
-        window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { 
-            document.getElementById('requestModal').classList.add('hidden'); 
-            document.getElementById('listModal').classList.add('hidden'); 
-            resetSearch(); 
-        } });
-
-        (function init() {
-            const today = new Date().toDateString();
-            if (localStorage.getItem('portal_last_visit') !== today) {
-                const randomTitle = TITLE_HEADERS[Math.floor(Math.random() * TITLE_HEADERS.length)];
-                localStorage.setItem('portalTitle', randomTitle);
-                localStorage.setItem('portal_last_visit', today);
-            }
-            document.getElementById('editableTitle').innerText = localStorage.getItem('portalTitle') || "Taran's Portal";
-            checkOnlineStatus();
-        })();
+        // ... (existing helper functions) ...
 
         async function checkOnlineStatus() {
-            fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('hfsStatus', true)).catch(() => setStatus('hfsStatus', false));
-            fetch(NAS_IP_ONLY, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('plexStatus', true)).catch(() => setStatus('plexStatus', false));
+            // Check File Server
+            fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' })
+                .then(() => setStatus('hfsStatus', true))
+                .catch(() => setStatus('hfsStatus', false));
+                
+            // Check NAS Status via admin port
+            fetch(NAS_SETTINGS_URL, { mode: 'no-cors', cache: 'no-store' })
+                .then(() => {
+                    const el = document.getElementById('plexStatus');
+                    if (el) el.innerHTML = `<span class="status-dot bg-green-500"></span> Online`;
+                })
+                .catch(() => {
+                    const el = document.getElementById('plexStatus');
+                    if (el) el.innerHTML = `<span class="status-dot bg-red-500"></span> Offline`;
+                });
         }
 
-        function setStatus(id, online) {
-            const el = document.getElementById(id);
-            if (el) el.innerHTML = online ? `<span class="status-dot bg-green-500"></span> Online` : `<span class="status-dot bg-red-500"></span> Offline`;
-        }
-
-        function doSearch(type) {
-            const q = document.getElementById('mainSearch').value;
-            if (type === 'google') {
-                if (!q) return;
-                window.location.href = `https://google.com/search?q=${encodeURIComponent(q)}`;
-            } else {
-                window.location.href = q ? `https://gemini.google.com/app?q=${encodeURIComponent(q)}` : `https://gemini.google.com/app`;
-            }
-        }
-
-        document.getElementById('movieSearch').addEventListener('input', async (e) => {
-            const val = e.target.value; if (val.length < 3) { document.getElementById('results').classList.add('hidden'); return; }
-            const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&query=${val}`);
-            const data = await res.json();
-            const results = document.getElementById('results'); results.innerHTML = ''; results.classList.remove('hidden');
-            data.results.slice(0, 5).forEach(item => {
-                const title = item.title || item.name; const year = (item.release_date || item.first_air_date || '').split('-')[0];
-                const div = document.createElement('div'); div.className = 'p-3 hover:bg-zinc-700 cursor-pointer border-b border-zinc-700 text-xs';
-                div.innerHTML = `<b>${title}</b> (${year})`;
-                div.onclick = () => item.media_type === 'tv' ? startTvFlow(item.id, title, year) : runVerification(title, year, "", "MOVIE");
-                results.appendChild(div);
-            });
-        });
-
-        async function startTvFlow(id, title, year) {
-            selectedShow = { id, title, year };
-            document.getElementById('searchContainer').classList.add('hidden');
-            document.getElementById('drillDownContainer').classList.remove('hidden');
-            const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}`);
-            const data = await res.json();
-            const box = document.getElementById('drillDownResults');
-            document.getElementById('backToSeasonBtn').classList.add('hidden');
-            box.innerHTML = `<div class="p-3 bg-emerald-600/20 text-center text-xs cursor-pointer mb-2" onclick="runVerification('${title}', '${year}', '', 'TV')">Request Full Series</div>`;
-            data.seasons.forEach(s => {
-                if(s.season_number === 0) return;
-                const d = document.createElement('div'); d.className = 'p-3 hover:bg-zinc-700 border-b border-zinc-700 text-xs cursor-pointer'; d.innerText = s.name;
-                d.onclick = () => {
-                    document.getElementById('backToSeasonBtn').classList.remove('hidden');
-                    box.innerHTML = `<div class="p-3 bg-blue-600/20 text-center text-xs cursor-pointer mb-2" onclick="runVerification('${title}', '${year}', '[Season ${s.season_number}]', 'TV')">Request Entire Season ${s.season_number}</div>`;
-                    for(let i=1; i<=s.episode_count; i++) {
-                        const ep = document.createElement('div'); ep.className = 'p-2 hover:bg-zinc-700 border-b border-zinc-700 text-[10px] pl-6 cursor-pointer'; ep.innerText = `Episode ${i}`;
-                        ep.onclick = () => runVerification(title, year, `[S${s.season_number}E${i.toString().padStart(2,'0')}]`, "TV");
-                        box.appendChild(ep);
-                    }
-                };
-                box.appendChild(d);
-            });
-        }
-
-        async function runVerification(title, year, tag, type) {
-            const entry = `${title} (${year}) ${tag} - ${type}`.trim();
-            const msg = document.getElementById('statusMsg');
-            let list = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
-            msg.classList.remove('hidden');
-            if(list.some(r => r.title === entry)) {
-                msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-zinc-800 text-yellow-400";
-                msg.innerText = "⚠️ Already in list!";
-            } else {
-                list.push({ title: entry, id: Date.now() });
-                localStorage.setItem('mediaRequests', JSON.stringify(list));
-                msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-zinc-800 text-emerald-400";
-                msg.innerText = "🚀 Added to Queue!";
-            }
-        }
-
-        function toggleModal(id) { const m = document.getElementById(id); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
-        function openListView() { renderRequests(); toggleModal('listModal'); }
-        function closeRequestModal() { toggleModal('requestModal'); resetSearch(); }
-        function resetSearch() { document.getElementById('movieSearch').value = ''; document.getElementById('searchContainer').classList.remove('hidden'); document.getElementById('drillDownContainer').classList.add('hidden'); document.getElementById('results').classList.add('hidden'); document.getElementById('statusMsg').classList.add('hidden'); selectedShow = null; }
-        function backToSeasons() { if(selectedShow) startTvFlow(selectedShow.id, selectedShow.title, selectedShow.year); }
-        function requestPlexAccess() { const email = prompt("Enter your Plex email:"); if (email) window.location.href = `mailto:taran.kurtz@gmail.com?subject=Plex Access Request&body=Requesting access for: ${email}`; }
-        
-        function renderRequests() {
-            const list = document.getElementById('publicRequestList');
-            const data = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
-            list.innerHTML = data.length === 0 ? '<li class="text-zinc-600 italic text-center text-xs py-10">Queue is empty</li>' :
-                data.map(req => `<li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-800 text-[11px]"><span>${req.title}</span>${adminMode ? `<button onclick="removeReq(${req.id})" class="text-red-500 px-2 font-bold">✕</button>` : ''}</li>`).join('');
-            if(adminMode) {
-                document.getElementById('adminListControls').classList.remove('hidden');
-                document.getElementById('codeLink').classList.remove('hidden');
-                document.getElementById('adminBtn').innerText = "ADMIN ACTIVE";
-                document.getElementById('adminBtn').classList.add('text-emerald-500');
-            }
-        }
-
-        function verifyAdmin() { 
-            const pass = prompt("Enter Admin Code:");
-            if (pass === ADMIN_PASS) { 
-                adminMode = true; 
-                renderRequests(); 
-            } else if (pass !== null) {
-                alert("Incorrect code.");
-            }
-        }
-        
-        function removeReq(id) { let data = JSON.parse(localStorage.getItem('mediaRequests') || '[]'); localStorage.setItem('mediaRequests', JSON.stringify(data.filter(r => r.id !== id))); renderRequests(); }
-        function clearAllRequests() { if(confirm("Clear everything?")) { localStorage.setItem('mediaRequests', '[]'); renderRequests(); } }
+        // ... (rest of your existing code) ...
     </script>
 </body>
 </html>
