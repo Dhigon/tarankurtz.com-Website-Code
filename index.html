@@ -45,11 +45,14 @@
 <body id="mainBody" class="bg-zinc-950 text-white min-h-screen flex flex-col items-center p-6 font-sans">
 
     <script>
-        const TITLE_HEADERS = ["Taran's Terminal", "Taran's Transit", "Kiki's Kiosk", "Kiki's Kingdom", "Taran's Portal"];
+        /* Configuration Section */
+        const TITLE_HEADERS = ["Taran's Territory", "Taran's Threshold", "Taran's Turnpike", "Taran's Town", "Taran's Tryst", "Taran's Tableau", "Taran's Track", "Taran's Terrain", "Taran's Tower", "Taran's Treasure-Trove", "Taran's Touchpoint", "Taran's Trading-Post", "Taran's Thoroughfare", "Kiki's Keep", "Kiki's Keyhole", "Kiki's Knot", "Kiki's Kinship", "Kiki's Kaleidoscope", "Kiki's Korner", "Kiki's Kerb", "Kiki's Knack", "Kiki's Kiln", "Kiki's Kernel", "Kiki's Keystone", "Kenzie's Kaleidoscope", "Kenzie's Knot", "Kenzie's Keep", "Kenzie's Key", "Kenzie's Korner", "Mackenzie's Meeting-Point", "Mackenzie's Mainstay", "Mackenzie's Map", "Mackenzie's Mission-Control", "Mackenzie's Manor", "Mackenzie's Meadow", "Mackenzie's Milestone", "Mackenzie's Meridian", "Mackenzie's Mezzanine", "Mackenzie's Motif", "Taran & Kiki's Kin", "The Taran & Kenzie Connection", "The Taran & Kenzie Knot", "Taran's & Kiki's Key-Point", "The Taran & Mackenzie Meeting-Hub"];
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         const PLEX_URL = 'http://plex.tarankurtz.com:32400'; 
-        const NAS_SETTINGS_URL = 'https://107.220.202.150:8001/';
+        const NAS_SETTINGS_URL = 'https://NAS.tarankurtz.com:8001/';
         const HFS_URL = 'https://transfer.tarankurtz.com:8443'; 
+        const ROUTER_URL = 'http://192.168.1.254';
+        const CLOUDFLARE_URL = 'https://dash.cloudflare.com/03c14d743f0edb4784c1a97f7214f300/home/overview';
         const ADMIN_PASS = 'Potatoes2!'; 
         const GITHUB_CODE_URL = 'https://github.com/Dhigon/personal-template-web/blob/main/index.html';
     </script>
@@ -146,26 +149,31 @@
         </div>
         <div class="flex flex-col items-center gap-3">
             <button onclick="verifyAdmin()" id="adminBtn" class="text-zinc-800 text-[9px] tracking-[0.4em] uppercase hover:text-zinc-500 transition-colors py-2 px-4">Admin Portal</button>
-            <button id="codeLink" onclick="window.location.href=GITHUB_CODE_URL" class="hidden text-emerald-600/60 text-[8px] tracking-[0.2em] uppercase hover:text-emerald-400 underline transition-colors">Website Code</button>
+            <div id="adminControls" class="hidden flex flex-wrap justify-center gap-4 mt-2">
+                <button onclick="window.location.href=GITHUB_CODE_URL" class="text-emerald-600/60 text-[8px] tracking-[0.2em] uppercase hover:text-emerald-400 underline">Website Code</button>
+                <button onclick="window.location.href=ROUTER_URL" class="text-blue-600/60 text-[8px] tracking-[0.2em] uppercase hover:text-blue-400 underline">Router</button>
+                <button onclick="window.location.href=CLOUDFLARE_URL" class="text-orange-600/60 text-[8px] tracking-[0.2em] uppercase hover:text-orange-400 underline">CloudFlare</button>
+            </div>
         </div>
     </footer>
 
     <script>
         let adminMode = false; let selectedShow = null;
 
-        window.addEventListener('keydown', (e) => { if (e.key === 'Escape') { document.getElementById('requestModal').classList.add('hidden'); document.getElementById('listModal').classList.add('hidden'); resetSearch(); } });
-
+        // Title rotation logic (15 minute interval)
         (function init() {
-            const today = new Date().toDateString();
-            if (localStorage.getItem('portal_last_visit') !== today) {
+            const lastUpdate = parseInt(localStorage.getItem('portal_last_title_update') || 0);
+            const now = Date.now();
+            if (now - lastUpdate > 15 * 60 * 1000) {
                 const randomTitle = TITLE_HEADERS[Math.floor(Math.random() * TITLE_HEADERS.length)];
                 localStorage.setItem('portalTitle', randomTitle);
-                localStorage.setItem('portal_last_visit', today);
+                localStorage.setItem('portal_last_title_update', now);
             }
             document.getElementById('editableTitle').innerText = localStorage.getItem('portalTitle') || "Taran's Portal";
             checkOnlineStatus();
         })();
 
+        // Health checks for servers
         async function checkOnlineStatus() {
             fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('hfsStatus', true)).catch(() => setStatus('hfsStatus', false));
             fetch(NAS_SETTINGS_URL, { mode: 'no-cors', cache: 'no-store' }).then(() => setStatus('plexStatus', true)).catch(() => setStatus('plexStatus', false));
@@ -176,6 +184,7 @@
             if (el) el.innerHTML = online ? `<span class="status-dot bg-green-500"></span> Online` : `<span class="status-dot bg-red-500"></span> Offline`;
         }
 
+        // Search engine handlers
         function doSearch(type) {
             const q = document.getElementById('mainSearch').value;
             if (type === 'google') {
@@ -186,6 +195,7 @@
             }
         }
 
+        // Media Request logic
         document.getElementById('movieSearch').addEventListener('input', async (e) => {
             const val = e.target.value; if (val.length < 3) { document.getElementById('results').classList.add('hidden'); return; }
             const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&query=${val}`);
@@ -241,6 +251,7 @@
             }
         }
 
+        // Modal/Admin helpers
         function toggleModal(id) { const m = document.getElementById(id); m.classList.toggle('hidden'); m.classList.toggle('flex'); }
         function openListView() { renderRequests(); toggleModal('listModal'); }
         function closeRequestModal() { toggleModal('requestModal'); resetSearch(); }
@@ -255,7 +266,7 @@
                 data.map(req => `<li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-800 text-[11px]"><span>${req.title}</span>${adminMode ? `<button onclick="removeReq(${req.id})" class="text-red-500 px-2 font-bold">✕</button>` : ''}</li>`).join('');
             if(adminMode) {
                 document.getElementById('adminListControls').classList.remove('hidden');
-                document.getElementById('codeLink').classList.remove('hidden');
+                document.getElementById('adminControls').classList.remove('hidden');
                 document.getElementById('adminBtn').innerText = "ADMIN ACTIVE";
                 document.getElementById('adminBtn').classList.add('text-emerald-500');
             }
