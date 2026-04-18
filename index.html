@@ -52,6 +52,7 @@
         const NAS_SETTINGS_URL = 'http://107.220.202.150:8000/';
         const HFS_URL = 'https://transfer.tarankurtz.com:8443'; 
         const ADMIN_PASS = 'Potatoes2!'; 
+        const GITHUB_CODE_URL = 'https://github.com/Dhigon/personal-template-web/blob/main/index.html';
     </script>
 
     <main class="flex-1 flex flex-col items-center justify-center w-full max-w-4xl py-10">
@@ -78,24 +79,24 @@
                 <div class="text-[11px] uppercase tracking-widest font-bold">Files</div>
             </div>
 
-            <div onclick="window.open(PLEX_URL, '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-orange-500">
+            <div onclick="window.location.href=PLEX_URL" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-orange-500">
                 <div id="plexStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-500 italic">Checking...</div>
                 <div class="text-3xl mb-1">🎬</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Plex</div>
                 <span onclick="event.stopPropagation(); requestPlexAccess();" class="absolute bottom-2 text-[8px] text-zinc-500 underline uppercase hover:text-orange-400 z-50">Request Access</span>
             </div>
 
-            <div onclick="window.open('https://youtube.com', '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-red-600">
+            <div onclick="window.location.href='https://youtube.com'" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-red-600">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="brand-icon" alt="YouTube">
                 <div class="text-[11px] uppercase tracking-widest font-bold">YouTube</div>
             </div>
 
-            <div onclick="window.open('https://remotedesktop.google.com/access', '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-blue-400">
+            <div onclick="window.location.href='https://remotedesktop.google.com/access'" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-blue-400">
                 <div class="text-3xl mb-1">🖥️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Remote</div>
             </div>
 
-            <div onclick="window.open(NAS_SETTINGS_URL, '_blank')" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-zinc-400">
+            <div onclick="window.location.href=NAS_SETTINGS_URL" class="dashboard-card bg-zinc-900/90 border border-zinc-800 rounded-2xl hover:border-zinc-400">
                 <div class="text-3xl mb-1">⚙️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-2">NAS Settings</div>
             </div>
@@ -149,9 +150,9 @@
             <button onclick="verifyAdmin()" id="adminBtn" class="text-zinc-800 text-[9px] tracking-[0.4em] uppercase hover:text-zinc-500 transition-colors py-2 px-4">
                 Admin Portal
             </button>
-            <a id="codeLink" href="https://github.com/Dhigon/personal-template-web/blob/main/index.html" target="_blank" class="hidden text-emerald-600/60 text-[8px] tracking-[0.2em] uppercase hover:text-emerald-400 underline transition-colors">
+            <button id="codeLink" onclick="window.location.href=GITHUB_CODE_URL" class="hidden text-emerald-600/60 text-[8px] tracking-[0.2em] uppercase hover:text-emerald-400 underline transition-colors">
                 Website Code
-            </a>
+            </button>
         </div>
     </footer>
 
@@ -191,7 +192,6 @@
                 if (!q) return;
                 window.location.href = `https://google.com/search?q=${encodeURIComponent(q)}`;
             } else {
-                // If text exists, query Gemini. If empty, just open Gemini.
                 window.location.href = q ? `https://gemini.google.com/app?q=${encodeURIComponent(q)}` : `https://gemini.google.com/app`;
             }
         }
