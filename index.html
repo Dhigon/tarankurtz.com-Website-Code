@@ -54,6 +54,11 @@
         const ADMIN_PASS = 'Potatoes2!'; 
     </script>
 
+    <a id="codeLink" href="https://github.com/Dhigon/personal-template-web/blob/main/index.html" target="_blank" class="hidden fixed bottom-6 right-6 z-[200] bg-emerald-600 hover:bg-emerald-500 text-white p-3 rounded-full shadow-2xl transition-all active:scale-90 flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+        <span class="text-[10px] uppercase font-bold tracking-widest pr-1">Edit Code</span>
+    </a>
+
     <main class="flex-1 flex flex-col items-center justify-center w-full max-w-4xl py-10">
         <div class="text-center mb-4">
             <p class="text-[10px] tracking-[0.3em] uppercase text-zinc-500 font-bold">tarankurtz.com</p>
@@ -109,7 +114,7 @@
     </main>
 
     <div id="requestModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
-        <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative modal-fixed-height">
+        <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative modal-fixed-height shadow-2xl">
             <button onclick="closeRequestModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
             <h2 class="text-xl font-semibold mb-6 text-center text-emerald-400 uppercase tracking-widest">Media Request</h2>
             <div id="searchContainer" class="flex flex-col flex-1 overflow-hidden">
@@ -129,9 +134,9 @@
     </div>
 
     <div id="listModal" class="fixed inset-0 bg-black/95 backdrop-blur-md hidden items-center justify-center z-[100] p-4">
-        <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative flex flex-col modal-fixed-height">
+        <div class="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-3xl relative flex flex-col modal-fixed-height shadow-2xl">
             <button onclick="toggleModal('listModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white">✕</button>
-            <h2 class="text-xl font-semibold mb-6 text-center text-yellow-400 uppercase">Current Queue</h2>
+            <h2 class="text-xl font-semibold mb-6 text-center text-yellow-400 uppercase tracking-widest">Current Queue</h2>
             <ul id="publicRequestList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
             <div id="adminListControls" class="hidden"><button onclick="clearAllRequests()" class="w-full bg-red-900/30 text-red-500 py-3 rounded-xl text-[10px] border border-red-900/50 uppercase">Clear All</button></div>
         </div>
@@ -140,7 +145,7 @@
     <footer class="mt-auto py-10 w-full flex flex-col items-center gap-6 z-50">
         <div class="help-trigger relative group">
             <span class="text-zinc-600 text-[10px] tracking-[0.3em] cursor-help uppercase hover:text-zinc-400 transition-colors">Mobile App Setup</span>
-            <div class="help-content w-64 bg-zinc-900/95 border border-zinc-800 p-4 rounded-2xl shadow-2xl text-center text-[9px] text-zinc-400 backdrop-blur-md border-b-0">
+            <div class="help-content w-64 bg-zinc-900/95 border border-zinc-800 p-4 rounded-2xl shadow-2xl text-center text-[9px] text-zinc-400 backdrop-blur-md">
                 <strong>iOS:</strong> Share > Add to Home Screen<br><strong>Android:</strong> Menu (⋮) > Install App
             </div>
         </div>
@@ -149,9 +154,6 @@
             <button onclick="verifyAdmin()" id="adminBtn" class="text-zinc-800 text-[9px] tracking-[0.4em] uppercase hover:text-zinc-500 transition-colors py-2 px-4">
                 Admin Portal
             </button>
-            <a id="codeLink" href="https://github.com/Dhigon/personal-template-web/blob/main/index.html" target="_blank" class="hidden text-emerald-600/60 text-[8px] tracking-[0.2em] uppercase hover:text-emerald-400 underline transition-colors">
-                Website Code
-            </a>
         </div>
     </footer>
 
@@ -181,10 +183,18 @@
             if (el) el.innerHTML = online ? `<span class="status-dot bg-green-500"></span> Online` : `<span class="status-dot bg-red-500"></span> Offline`;
         }
 
+        // FIXED Search Logic
         function doSearch(type) {
-            const q = document.getElementById('mainSearch').value;
-            if (!q) return;
-            window.location.href = type === 'google' ? `https://google.com/search?q=${encodeURIComponent(q)}` : `https://gemini.google.com/app?q=${encodeURIComponent(q)}`;
+            const q = document.getElementById('mainSearch').value.trim();
+            if (type === 'google') {
+                if (!q) return;
+                window.open(`https://google.com/search?q=${encodeURIComponent(q)}`, '_blank');
+            } else {
+                // Gemini Logic: Open with query if exists, otherwise just open Gemini
+                const baseUrl = "https://gemini.google.com/app";
+                const fullUrl = q ? `${baseUrl}?q=${encodeURIComponent(q)}` : baseUrl;
+                window.open(fullUrl, '_blank');
+            }
         }
 
         document.getElementById('movieSearch').addEventListener('input', async (e) => {
@@ -247,33 +257,4 @@
         function closeRequestModal() { toggleModal('requestModal'); resetSearch(); }
         function resetSearch() { document.getElementById('movieSearch').value = ''; document.getElementById('searchContainer').classList.remove('hidden'); document.getElementById('drillDownContainer').classList.add('hidden'); document.getElementById('results').classList.add('hidden'); document.getElementById('statusMsg').classList.add('hidden'); selectedShow = null; }
         function backToSeasons() { if(selectedShow) startTvFlow(selectedShow.id, selectedShow.title, selectedShow.year); }
-        function requestPlexAccess() { const email = prompt("Enter your Plex email:"); if (email) window.location.href = `mailto:taran.kurtz@gmail.com?subject=Plex Access Request&body=Requesting access for: ${email}`; }
-        
-        function renderRequests() {
-            const list = document.getElementById('publicRequestList');
-            const data = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
-            list.innerHTML = data.length === 0 ? '<li class="text-zinc-600 italic text-center text-xs py-10">Queue is empty</li>' :
-                data.map(req => `<li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-800 text-[11px]"><span>${req.title}</span>${adminMode ? `<button onclick="removeReq(${req.id})" class="text-red-500 px-2 font-bold">✕</button>` : ''}</li>`).join('');
-            if(adminMode) {
-                document.getElementById('adminListControls').classList.remove('hidden');
-                document.getElementById('codeLink').classList.remove('hidden');
-                document.getElementById('adminBtn').innerText = "ADMIN ACTIVE";
-                document.getElementById('adminBtn').classList.add('text-emerald-500');
-            }
-        }
-
-        function verifyAdmin() { 
-            const pass = prompt("Enter Admin Code:");
-            if (pass === ADMIN_PASS) { 
-                adminMode = true; 
-                renderRequests(); 
-            } else if (pass !== null) {
-                alert("Incorrect code.");
-            }
-        }
-        
-        function removeReq(id) { let data = JSON.parse(localStorage.getItem('mediaRequests') || '[]'); localStorage.setItem('mediaRequests', JSON.stringify(data.filter(r => r.id !== id))); renderRequests(); }
-        function clearAllRequests() { if(confirm("Clear everything?")) { localStorage.setItem('mediaRequests', '[]'); renderRequests(); } }
-    </script>
-</body>
-</html>
+        function requestPlexAccess()
