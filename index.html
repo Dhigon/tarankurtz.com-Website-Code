@@ -7,10 +7,11 @@
     <title>Taran's Portal</title>
     
     <!-- iOS and Android specific tags for PWA-like appearance -->
+    <!-- Re-added port 8443 to the ASSET URLs to match the Request -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://transfer.tarankurtz.com/KurtzHome610/assets%20(website)/images/ICON.jpg">
-    <link rel="icon" type="image/jpeg" href="https://transfer.tarankurtz.com/KurtzHome610/assets%20(website)/images/ICON.jpg">
+    <link rel="apple-touch-icon" href="https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
+    <link rel="icon" type="image/jpeg" href="https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
 
     <!-- Tailwind CSS for rapid styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,13 +22,13 @@
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
         
-        /* Main background styling with fallback color and fixed attachment */
+        /* Main background styling: The actual image is now set dynamically by JavaScript! */
         #mainBody { 
-            background-image: url('https://transfer.tarankurtz.com/KurtzHome610/assets%20(website)/images/background-1.jpg');
             background-size: cover; 
             background-position: center; 
             background-attachment: fixed; 
-            background-color: #09090b;
+            background-color: #09090b; /* Fallback color */
+            transition: background-image 1s ease-in-out; /* Smooth transition when rotating backgrounds */
         }
 
         /* Server status indicator dot */
@@ -87,17 +88,21 @@
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         
         // Software Network URLs
-        const PLEX_URL = 'http://plex.tarankurtz.com:32400'; 
-        const NAS_SETTINGS_URL = 'https://nas.tarankurtz.com';
-        const HFS_URL = 'https://transfer.tarankurtz.com'; 
+        const PLEX_URL = 'http://plex.tarankurtz.com:32400';                // DNS only, HTTP + port
+        const HFS_URL = 'https://Files.tarankurtz.com:8443';                // DNS only, HTTPS + port
+        const NAS_SETTINGS_URL = 'https://nas.tarankurtz.com';              // Tunnel, no port
+        const DOWNLOAD_URL = 'https://download.tarankurtz.com';             // Tunnel, no port
+        const SEARCH_URL = 'https://search.tarankurtz.com';                 // Tunnel, no port
+        
         const ROUTER_URL = 'http://192.168.1.254';
         const CLOUDFLARE_URL = 'https://dash.cloudflare.com/03c14d743f0edb4784c1a97f7214f300/home/overview';
+        
+        // Background Image Config
+        const MAX_BACKGROUNDS = 5; // <--- UPDATE THIS based on how many background files you add to your HFS server (e.g. 1 through 5)
         
         // Admin & Backend Services
         const ADMIN_PASS = 'Potatoes2!'; 
         const GITHUB_CODE_URL = 'https://github.com/Dhigon/personal-template-web/blob/main/index.html';
-        
-        // Formspree Endpoint for Automated Emails
         const FORMSPREE_ENDPOINT = 'https://formspree.io/f/meevzjao';
     </script>
 
@@ -122,7 +127,7 @@
             </div>
         </div>
 
-        <!-- Dashboard Grid Cards -->
+        <!-- Dashboard Grid Cards - Now 8 cards for a perfect 4-column layout -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full mb-12">
             
             <!-- HFS Files Card -->
@@ -137,7 +142,6 @@
                 <div id="plexStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-400 italic">Checking...</div>
                 <div class="text-3xl mb-1 drop-shadow-md">🎬</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Plex</div>
-                <!-- Opens Email Form Modal -->
                 <span onclick="event.stopPropagation(); toggleModal('emailModal');" onauxclick="event.stopPropagation();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-orange-400 z-50 transition-colors">Request Access</span>
             </div>
 
@@ -166,11 +170,17 @@
                 <span onclick="event.stopPropagation(); openListView();" class="absolute bottom-2 text-[9px] text-zinc-400 underline uppercase tracking-widest hover:text-white z-50 transition-colors">View List</span>
             </div>
 
-            <!-- Downloader API Card -->
+            <!-- NEW: Search Downloads Card -->
+            <div onclick="handleLink(event, SEARCH_URL)" onauxclick="handleLink(event, SEARCH_URL)" class="dashboard-card rounded-2xl hover:border-pink-500">
+                <div class="text-3xl mb-1 drop-shadow-md">🔍</div>
+                <div class="text-[11px] uppercase tracking-widest font-bold">Search</div>
+                <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-widest z-50">Downloads</span>
+            </div>
+
+            <!-- Downloader Modal Card -->
             <div onclick="toggleModal('downloaderModal')" class="dashboard-card rounded-2xl hover:border-purple-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🧲</div>
-                <div class="text-[11px] uppercase tracking-widest font-bold">Downloader</div>
-                <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-widest z-50">qBittorrent</span>
+                <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>Progress</div>
             </div>
         </div>
     </main>
@@ -186,7 +196,6 @@
             <h2 class="text-xl font-semibold mb-2 text-center text-orange-400 uppercase tracking-widest drop-shadow-md">Plex Access</h2>
             <p class="text-[10px] text-zinc-400 text-center mb-6">Enter your email to request an invite.</p>
             
-            <!-- Automated Email Form connected to Formspree -->
             <form id="plexEmailForm" action="https://formspree.io/f/meevzjao" method="POST" onsubmit="handleEmailSubmit(event)" class="flex flex-col gap-4">
                 <input type="hidden" name="subject" value="New Plex Access Request">
                 <input type="email" name="email" required placeholder="your.email@example.com" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-orange-500 transition-colors">
@@ -243,14 +252,14 @@
     <div id="downloaderModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
         <div class="w-full max-w-md bg-zinc-900/90 border border-purple-700/30 p-8 rounded-3xl relative flex flex-col modal-fixed-height shadow-2xl backdrop-blur-md">
             <button onclick="toggleModal('downloaderModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
-            <h2 class="text-xl font-semibold mb-2 text-center text-purple-400 uppercase tracking-widest drop-shadow-md">Downloader Tasks</h2>
+            <h2 class="text-xl font-semibold mb-2 text-center text-purple-400 uppercase tracking-widest drop-shadow-md">Download Progress</h2>
             <p class="text-[10px] text-zinc-400 text-center uppercase tracking-widest mb-6">Check off items to begin search/download</p>
             
             <!-- List Container for Downloads -->
             <ul id="downloaderTaskList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
             
-            <!-- Link pointed to Local Docker qBittorrent on PC -->
-            <button onclick="window.open('http://192.168.1.77:8080', '_blank')" class="w-full bg-purple-900/30 hover:bg-purple-900/50 border border-purple-700/50 py-3 rounded-xl text-[10px] text-purple-300 hover:text-white uppercase tracking-widest transition-colors">
+            <!-- WebUI now connects securely to your new Download Cloudflare Tunnel -->
+            <button onclick="window.open(DOWNLOAD_URL, '_blank')" class="w-full bg-purple-900/30 hover:bg-purple-900/50 border border-purple-700/50 py-3 rounded-xl text-[10px] text-purple-300 hover:text-white uppercase tracking-widest transition-colors">
                 Open WebUI
             </button>
         </div>
@@ -300,19 +309,35 @@
         let viewingActors = false; 
 
         /**
-         * Initialize application
+         * Initialize application & Background Rotation
          */
         (function init() {
-            const lastUpdate = parseInt(localStorage.getItem('portal_last_title_update') || 0);
             const now = Date.now();
-            if (now - lastUpdate > 15 * 60 * 1000) {
+
+            // 1. Title Rotation Logic (15 min interval)
+            const lastTitleUpdate = parseInt(localStorage.getItem('portal_last_title_update') || 0);
+            if (now - lastTitleUpdate > 15 * 60 * 1000) {
                 const randomTitle = TITLE_HEADERS[Math.floor(Math.random() * TITLE_HEADERS.length)];
                 localStorage.setItem('portalTitle', randomTitle);
                 localStorage.setItem('portal_last_title_update', now);
             }
             document.getElementById('editableTitle').innerText = localStorage.getItem('portalTitle') || "Taran's Portal";
+
+            // 2. Dynamic Background Rotation Logic (30 min interval)
+            const lastBgUpdate = parseInt(localStorage.getItem('portal_last_bg_update') || 0);
+            if (now - lastBgUpdate > 30 * 60 * 1000 || !localStorage.getItem('portalBg')) {
+                // Pick a random number between 1 and your MAX_BACKGROUNDS constant
+                const randomBgNum = Math.floor(Math.random() * MAX_BACKGROUNDS) + 1;
+                localStorage.setItem('portalBg', randomBgNum);
+                localStorage.setItem('portal_last_bg_update', now);
+            }
+            const bgNum = localStorage.getItem('portalBg') || 1;
+            // %20 handles the spaces in "Background - 1.jpg"
+            const bgUrl = `https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/Background%20-%20${bgNum}.jpg`;
+            document.getElementById('mainBody').style.backgroundImage = `url('${bgUrl}')`;
+
+            // 3. Status checks and renders
             checkOnlineStatus();
-            
             renderRequests();
         })();
 
@@ -439,6 +464,7 @@
 
         /**
          * Health checks for critical servers
+         * (Status dots maintained strictly for Files and Plex per request)
          */
         async function checkOnlineStatus() {
             // Check HFS local
@@ -446,7 +472,7 @@
                 .then(() => setStatus('hfsStatus', true))
                 .catch(() => setStatus('hfsStatus', false));
             
-            // Check Plex link to NAS
+            // Check Plex link to NAS (Since NAS tunnel manages the box hosting Plex)
             fetch(NAS_SETTINGS_URL, { mode: 'no-cors', cache: 'no-store' })
                 .then(() => setStatus('plexStatus', true))
                 .catch(() => setStatus('plexStatus', false));
