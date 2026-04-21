@@ -87,22 +87,29 @@
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         
         // Software Network URLs
-        const PLEX_URL = 'http://plex.tarankurtz.com:32400';                // Plex Direct App URL
-        const HFS_URL = 'https://transfer.tarankurtz.com:8443';             // Updated Files URL
+        const PLEX_URL = 'https://app.plex.tv/desktop';                     // Points to secure Plex Web App
+        const HFS_URL = 'https://transfer.tarankurtz.com:8443';             // Files URL with explicit port
         const NAS_SETTINGS_URL = 'https://nas.tarankurtz.com';              // Tunnel, no port
         const DOWNLOAD_URL = 'https://download.tarankurtz.com';             // Tunnel, no port
         const SEARCH_URL = 'https://search.tarankurtz.com';                 // Tunnel, no port
+        
+        // NEW Rename App URLs
+        const RENAME_TV_URL = 'https://renametv.tarankurtz.com';
+        const RENAME_MOVIE_URL = 'https://renamemovie.tarankurtz.com';
         
         const ROUTER_URL = 'http://192.168.1.254';
         const CLOUDFLARE_URL = 'https://dash.cloudflare.com/03c14d743f0edb4784c1a97f7214f300/home/overview';
         
         // Background Image Config
-        const MAX_BACKGROUNDS = 5; // Update this based on how many background files you have (e.g. 1 through 5)
+        const MAX_BACKGROUNDS = 5; 
         
         // Admin & Backend Services
         const ADMIN_PASS = 'Potatoes2!'; 
         const GITHUB_CODE_URL = 'https://github.com/Dhigon/personal-template-web/blob/main/index.html';
-        const FORMSPREE_ENDPOINT = 'https://formspree.io/f/meevzjao';
+        
+        // Formspree Endpoints
+        const FORMSPREE_PLEX_ENDPOINT = 'https://formspree.io/f/meevzjao';
+        const FORMSPREE_UPLOAD_ENDPOINT = 'https://formspree.io/f/mbdqakda';
     </script>
 
     <!-- Main Content Container -->
@@ -126,7 +133,7 @@
             </div>
         </div>
 
-        <!-- Dashboard Grid Cards - 8 cards in a 4-column layout -->
+        <!-- Dashboard Grid Cards - 10 cards in a 4-column layout -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full mb-12">
             
             <!-- HFS Files Card -->
@@ -134,7 +141,7 @@
                 <div id="hfsStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-400 italic">Checking...</div>
                 <div class="text-3xl mb-1 drop-shadow-md">📂</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Files</div>
-                <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-wider z-50">User:admin | Pass:1234</span>
+                <span onclick="event.stopPropagation(); toggleModal('uploadAccessModal');" onauxclick="event.stopPropagation();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-blue-400 z-50 transition-colors">Request Upload Access</span>
             </div>
 
             <!-- Plex Media Card -->
@@ -182,12 +189,41 @@
                 <div class="text-3xl mb-1 drop-shadow-md">🧲</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>Progress</div>
             </div>
+
+            <!-- NEW: TV Rename App Card -->
+            <div onclick="handleLink(event, RENAME_TV_URL)" onauxclick="handleLink(event, RENAME_TV_URL)" class="dashboard-card rounded-2xl hover:border-teal-500">
+                <div class="text-3xl mb-1 drop-shadow-md">📺</div>
+                <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">TV<br>Rename</div>
+            </div>
+
+            <!-- NEW: Movie Rename App Card -->
+            <div onclick="handleLink(event, RENAME_MOVIE_URL)" onauxclick="handleLink(event, RENAME_MOVIE_URL)" class="dashboard-card rounded-2xl hover:border-indigo-500">
+                <div class="text-3xl mb-1 drop-shadow-md">🎞️</div>
+                <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Movie<br>Rename</div>
+            </div>
         </div>
     </main>
 
     <!-- ==============================================
          MODALS & DIALOGS SECTION 
          ============================================== -->
+
+    <!-- Files Upload Access Form Modal -->
+    <div id="uploadAccessModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[150] p-4">
+        <div class="w-full max-w-sm bg-zinc-900/95 border border-blue-700/50 p-8 rounded-3xl relative shadow-2xl backdrop-blur-md">
+            <button onclick="toggleModal('uploadAccessModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
+            <h2 class="text-xl font-semibold mb-2 text-center text-blue-400 uppercase tracking-widest drop-shadow-md">Upload Access</h2>
+            <p class="text-[10px] text-zinc-400 text-center mb-6">What do you want your Username and Password to be?</p>
+            
+            <form id="uploadAccessForm" action="https://formspree.io/f/mbdqakda" method="POST" onsubmit="handleEmailSubmit(event, 'uploadStatusMsg', 'uploadAccessModal')" class="flex flex-col gap-4">
+                <input type="hidden" name="subject" value="New Files Upload Access Request">
+                <input type="email" name="email" required placeholder="your.email@example.com (for reply)" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-blue-500 transition-colors">
+                <input type="text" name="requested_credentials" required placeholder="[USER]:[PASS]" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-blue-500 transition-colors">
+                <button type="submit" class="w-full bg-blue-600/80 hover:bg-blue-500 py-3 rounded-xl text-[11px] text-white uppercase tracking-widest font-bold transition-all mt-2">Send Request</button>
+                <div id="uploadStatusMsg" class="text-center text-xs hidden mt-2 font-bold"></div>
+            </form>
+        </div>
+    </div>
 
     <!-- Plex Email Access Form Modal -->
     <div id="emailModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[150] p-4">
@@ -196,7 +232,7 @@
             <h2 class="text-xl font-semibold mb-2 text-center text-orange-400 uppercase tracking-widest drop-shadow-md">Plex Access</h2>
             <p class="text-[10px] text-zinc-400 text-center mb-6">Enter your email to request an invite.</p>
             
-            <form id="plexEmailForm" action="https://formspree.io/f/meevzjao" method="POST" onsubmit="handleEmailSubmit(event)" class="flex flex-col gap-4">
+            <form id="plexEmailForm" action="https://formspree.io/f/meevzjao" method="POST" onsubmit="handleEmailSubmit(event, 'emailStatusMsg', 'emailModal')" class="flex flex-col gap-4">
                 <input type="hidden" name="subject" value="New Plex Access Request">
                 <input type="email" name="email" required placeholder="your.email@example.com" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-orange-500 transition-colors">
                 <button type="submit" class="w-full bg-orange-600/80 hover:bg-orange-500 py-3 rounded-xl text-[11px] text-white uppercase tracking-widest font-bold transition-all mt-2">Send Request</button>
@@ -236,13 +272,22 @@
             <button onclick="toggleModal('listModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
             <h2 class="text-xl font-semibold mb-6 text-center text-yellow-400 uppercase tracking-widest drop-shadow-md">Current Queue</h2>
             
+            <!-- Added a loading indicator for the remote DB -->
+            <div id="dbLoading" class="text-center text-xs text-zinc-500 mb-2 italic">Syncing with server...</div>
             <ul id="publicRequestList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
             
-            <button id="toggleActorBtn" onclick="toggleActorView()" class="w-full bg-zinc-800/50 hover:bg-zinc-700 border border-zinc-700/50 py-3 rounded-xl text-[10px] text-zinc-400 hover:text-white uppercase tracking-widest transition-colors mb-4">
-                Favorite Actors to Watch
-            </button>
+            <!-- Navigation Controls -->
+            <div class="mt-auto flex flex-col gap-2">
+                <button id="toggleActorBtn" onclick="toggleActorView()" class="w-full bg-zinc-800/50 hover:bg-zinc-700 border border-zinc-700/50 py-3 rounded-xl text-[10px] text-zinc-400 hover:text-white uppercase tracking-widest transition-colors">
+                    Favorite Actors to Watch
+                </button>
+                
+                <button onclick="toggleModal('listModal'); toggleModal('requestModal');" class="w-full bg-emerald-900/20 hover:bg-emerald-900/40 border border-emerald-700/30 hover:border-emerald-500/50 py-3 rounded-xl text-[10px] text-emerald-500 hover:text-emerald-400 uppercase tracking-widest transition-all">
+                    Return to Request Form
+                </button>
+            </div>
 
-            <div id="adminListControls" class="hidden">
+            <div id="adminListControls" class="hidden mt-4">
                 <button onclick="clearAllRequests()" class="w-full bg-red-900/30 hover:bg-red-900/50 text-red-500 py-3 rounded-xl text-[10px] border border-red-900/50 uppercase transition-colors">Clear All</button>
             </div>
         </div>
@@ -255,10 +300,8 @@
             <h2 class="text-xl font-semibold mb-2 text-center text-purple-400 uppercase tracking-widest drop-shadow-md">Download Progress</h2>
             <p class="text-[10px] text-zinc-400 text-center uppercase tracking-widest mb-6">Check off items to begin search/download</p>
             
-            <!-- List Container for Downloads -->
             <ul id="downloaderTaskList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
             
-            <!-- WebUI now connects securely to your new Download Cloudflare Tunnel -->
             <button onclick="window.open(DOWNLOAD_URL, '_blank')" class="w-full bg-purple-900/30 hover:bg-purple-900/50 border border-purple-700/50 py-3 rounded-xl text-[10px] text-purple-300 hover:text-white uppercase tracking-widest transition-colors">
                 Open WebUI
             </button>
@@ -301,20 +344,29 @@
     </footer>
 
     <!-- ==============================================
-         APPLICATION LOGIC & SCRIPTS
+         APPLICATION LOGIC & SCRIPTS (Firebase Integration)
          ============================================== -->
-    <script>
+    <!-- Uses Script tags (ES modules via CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // State Variables
         let adminMode = false; 
         let selectedShow = null;
         let viewingActors = false; 
+        
+        // Firebase State Variables
+        let db, auth, currentUser;
+        let globalRequests = []; 
 
         /**
-         * Initialize application & Background Rotation
+         * 1. App Initialization & Background Rotation
          */
         (function init() {
             const now = Date.now();
 
-            // 1. Title Rotation Logic (15 min interval)
             const lastTitleUpdate = parseInt(localStorage.getItem('portal_last_title_update') || 0);
             if (now - lastTitleUpdate > 15 * 60 * 1000) {
                 const randomTitle = TITLE_HEADERS[Math.floor(Math.random() * TITLE_HEADERS.length)];
@@ -323,7 +375,6 @@
             }
             document.getElementById('editableTitle').innerText = localStorage.getItem('portalTitle') || "Taran's Portal";
 
-            // 2. Dynamic Background Rotation Logic (30 min interval)
             const lastBgUpdate = parseInt(localStorage.getItem('portal_last_bg_update') || 0);
             if (now - lastBgUpdate > 30 * 60 * 1000 || !localStorage.getItem('portalBg')) {
                 const randomBgNum = Math.floor(Math.random() * MAX_BACKGROUNDS) + 1;
@@ -331,17 +382,106 @@
                 localStorage.setItem('portal_last_bg_update', now);
             }
             const bgNum = localStorage.getItem('portalBg') || 1;
-            // Background - #.jpg via HFS
             const bgUrl = `https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/Background%20-%20${bgNum}.jpg`;
             document.getElementById('mainBody').style.backgroundImage = `url('${bgUrl}')`;
 
-            // 3. Status checks and renders
             checkOnlineStatus();
-            renderRequests();
         })();
 
         /**
-         * Global Escape Key Listener for Modals
+         * 2. Firebase Database Initialization
+         * Uses the hardcoded specific config provided
+         */
+        try {
+            const firebaseConfig = {
+                apiKey: "AIzaSyDSYd-a-xZP_rGZB2aXKze0m3tL5xCf-cc",
+                authDomain: "website-request-92a19.firebaseapp.com",
+                projectId: "website-request-92a19",
+                storageBucket: "website-request-92a19.firebasestorage.app",
+                messagingSenderId: "824697993687",
+                appId: "1:824697993687:web:04d5fa0ef62c911b123392",
+                measurementId: "G-KVN29VS52Y"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            
+            const appId = "taran-portal"; 
+
+            // Authenticate anonymously with try-catch block to handle unconfigured Firebase
+            const initAuth = async () => {
+                try {
+                    await signInAnonymously(auth);
+                } catch (error) {
+                    console.error("Firebase Authentication Error:", error);
+                    const loadingEl = document.getElementById('dbLoading');
+                    if (loadingEl) {
+                        loadingEl.classList.remove('hidden');
+                        if (error.code === 'auth/configuration-not-found') {
+                            loadingEl.innerText = "Auth Error: Please click 'Get Started' in the Authentication tab of your Firebase Console.";
+                        } else if (error.code === 'auth/operation-not-allowed') {
+                            loadingEl.innerText = "Auth Error: Please enable the 'Anonymous' sign-in provider in your Firebase Console.";
+                        } else {
+                            loadingEl.innerText = "Database connection failed: " + error.message;
+                        }
+                    }
+                }
+            };
+            
+            initAuth();
+
+            // Listen for Real-Time Changes
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    const reqRef = collection(db, 'artifacts', appId, 'public', 'data', 'mediaRequests');
+                    
+                    onSnapshot(reqRef, (snapshot) => {
+                        globalRequests = [];
+                        snapshot.forEach(doc => {
+                            globalRequests.push(doc.data());
+                        });
+                        
+                        globalRequests.sort((a, b) => a.id - b.id);
+                        
+                        document.getElementById('dbLoading').classList.add('hidden');
+                        renderRequests(); 
+                    }, (error) => {
+                        console.error("Firestore sync error:", error);
+                        const loadingEl = document.getElementById('dbLoading');
+                        if(loadingEl) loadingEl.innerText = "Sync failed. Check Firebase rules.";
+                    });
+                }
+            });
+
+        } catch (e) {
+            console.error("Firebase initialization failed.", e);
+            const loadingEl = document.getElementById('dbLoading');
+            if(loadingEl) loadingEl.innerText = "Database connection failed.";
+        }
+
+        /**
+         * 3. Export functions to the Window so inline HTML "onclick" attributes can reach them
+         */
+        window.handleLink = handleLink;
+        window.showCustomDialog = showCustomDialog;
+        window.doSearch = doSearch;
+        window.toggleModal = toggleModal;
+        window.openListView = openListView;
+        window.closeRequestModal = closeRequestModal;
+        window.resetSearch = resetSearch;
+        window.backToSeasons = backToSeasons;
+        window.toggleActorView = toggleActorView;
+        window.removeReq = removeReq;
+        window.clearAllRequests = clearAllRequests;
+        window.toggleDownloadState = toggleDownloadState;
+        window.verifyAdmin = verifyAdmin;
+        window.handleEmailSubmit = handleEmailSubmit;
+        window.runVerification = runVerification; 
+        
+        /**
+         * UI Event Listeners
          */
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -349,21 +489,20 @@
                 const lModal = document.getElementById('listModal');
                 const dModal = document.getElementById('downloaderModal');
                 const eModal = document.getElementById('emailModal');
+                const uModal = document.getElementById('uploadAccessModal');
                 
                 if (!rModal.classList.contains('hidden')) closeRequestModal();
                 if (!lModal.classList.contains('hidden')) toggleModal('listModal');
                 if (!dModal.classList.contains('hidden')) toggleModal('downloaderModal');
                 if (!eModal.classList.contains('hidden')) toggleModal('emailModal');
+                if (!uModal.classList.contains('hidden')) toggleModal('uploadAccessModal');
             }
         });
 
-        /**
-         * Formspree Email Submission Handler (Ajax to prevent page redirect)
-         */
-        async function handleEmailSubmit(event) {
+        async function handleEmailSubmit(event, statusMsgId, modalId) {
             event.preventDefault(); 
             const form = event.target;
-            const statusMsg = document.getElementById('emailStatusMsg');
+            const statusMsg = document.getElementById(statusMsgId);
             
             if (form.action.includes('YOUR_FORM_ID')) {
                 statusMsg.className = "text-center text-xs mt-3 font-bold text-red-400";
@@ -385,7 +524,7 @@
                     statusMsg.innerText = "Request sent successfully!";
                     statusMsg.classList.remove('hidden');
                     form.reset();
-                    setTimeout(() => toggleModal('emailModal'), 2000);
+                    setTimeout(() => { toggleModal(modalId); statusMsg.classList.add('hidden'); }, 2000);
                 } else {
                     statusMsg.className = "text-center text-xs mt-3 font-bold text-red-400";
                     statusMsg.innerText = "Oops! There was a problem sending the request.";
@@ -398,9 +537,6 @@
             }
         }
 
-        /**
-         * Enhanced Link Click Handler (Left click vs Middle Click)
-         */
         function handleLink(e, url, forceNewTab = false) {
             if (e.type === 'click' && e.button === 0) {
                 if (forceNewTab || e.ctrlKey || e.metaKey) window.open(url, '_blank');
@@ -411,9 +547,6 @@
             }
         }
 
-        /**
-         * Custom Dialog Handler
-         */
         function showCustomDialog(type, message, placeholder = "") {
             return new Promise((resolve) => {
                 const modal = document.getElementById('customDialogModal');
@@ -460,16 +593,11 @@
             });
         }
 
-        /**
-         * Health checks for critical servers (Uses HTTPS to prevent Mixed Content blocking)
-         */
         async function checkOnlineStatus() {
-            // Check HFS (Using exact HTTPS URL to satisfy browser constraints)
             fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' })
                 .then(() => setStatus('hfsStatus', true))
                 .catch(() => setStatus('hfsStatus', false));
             
-            // Check Plex (Checking the NAS Tunnel directly because it has a valid HTTPS certificate)
             fetch(NAS_SETTINGS_URL, { mode: 'no-cors', cache: 'no-store' })
                 .then(() => setStatus('plexStatus', true))
                 .catch(() => setStatus('plexStatus', false));
@@ -484,9 +612,6 @@
             }
         }
 
-        /**
-         * Search Engine Handler
-         */
         function doSearch(type) {
             const q = document.getElementById('mainSearch').value;
             if (type === 'google') {
@@ -497,9 +622,7 @@
             }
         }
 
-        /**
-         * TMDB Media Request Search
-         */
+        // TMDB Search UI Logic
         document.getElementById('movieSearch').addEventListener('input', async (e) => {
             const val = e.target.value; 
             if (val.length < 3) { 
@@ -521,7 +644,6 @@
                     
                     div.className = 'p-3 hover:bg-zinc-700/80 cursor-pointer border-b border-zinc-700/50 text-xs transition-colors flex justify-between items-center';
                     
-                    // Format year (exclude for persons)
                     const yearDisplay = (year && item.media_type !== 'person') ? `(${year})` : '';
                     div.innerHTML = `<span><b>${title}</b> ${yearDisplay}</span> <span class="text-[9px] font-bold text-zinc-500 uppercase">${item.media_type}</span>`;
                     
@@ -582,26 +704,33 @@
             }
         }
 
-        function runVerification(title, year, tag, type) {
+        // Firebase Sync: Add a new request
+        async function runVerification(title, year, tag, type) {
+            if (!currentUser) return; // Prevent unauthenticated queries
+            const appId = "taran-portal"; 
+            
             let entry = title;
             if (year && type !== 'PERSON') entry += ` (${year})`; 
             if (tag) entry += ` ${tag}`;
             entry += ` - ${type}`;
 
             const msg = document.getElementById('statusMsg');
-            let list = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
-            
             msg.classList.remove('hidden');
             
-            if(list.some(r => r.title === entry)) {
+            if(globalRequests.some(r => r.title === entry)) {
                 msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-yellow-900/40 text-yellow-400 border border-yellow-700/50";
                 msg.innerText = "⚠️ Already in list!";
             } else {
-                list.push({ title: entry, id: Date.now(), dl_status: 'pending' });
-                localStorage.setItem('mediaRequests', JSON.stringify(list));
-                msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-700/50";
-                msg.innerText = "🚀 Added to Queue!";
-                renderRequests(); 
+                try {
+                    const newId = Date.now();
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', newId.toString());
+                    await setDoc(docRef, { title: entry, id: newId, dl_status: 'pending' });
+                    
+                    msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-700/50";
+                    msg.innerText = "🚀 Added to Server Queue!";
+                } catch(e) {
+                    console.error("Failed to add to database.", e);
+                }
             }
         }
 
@@ -612,7 +741,6 @@
         }
 
         function openListView() { 
-            renderRequests(); 
             toggleModal('listModal'); 
         }
 
@@ -641,14 +769,14 @@
         }
 
         /**
-         * Renders BOTH the standard Request List and the Downloader Task List
+         * Dynamic Data Rendering using the globalRequests array synced from Firebase
          */
         function renderRequests() {
             const reqList = document.getElementById('publicRequestList');
             const dlList = document.getElementById('downloaderTaskList');
             const toggleBtn = document.getElementById('toggleActorBtn');
             
-            const data = JSON.parse(localStorage.getItem('mediaRequests') || '[]');
+            const data = globalRequests;
             
             const filteredData = data.filter(req => 
                 viewingActors ? req.title.endsWith('- PERSON') : !req.title.endsWith('- PERSON')
@@ -692,16 +820,19 @@
             }
         }
 
-        function toggleDownloadState(id) {
-            let data = JSON.parse(localStorage.getItem('mediaRequests') || '[]'); 
-            const idx = data.findIndex(r => r.id === id);
-            if (idx > -1) {
-                data[idx].dl_status = data[idx].dl_status === 'downloading' ? 'pending' : 'downloading';
-                localStorage.setItem('mediaRequests', JSON.stringify(data));
-                renderRequests(); 
+        // Firebase Sync: Update Download Checkbox
+        async function toggleDownloadState(id) {
+            if(!currentUser) return;
+            const appId = "taran-portal"; 
+            const req = globalRequests.find(r => r.id === id);
+            if (req) {
+                const newStatus = req.dl_status === 'downloading' ? 'pending' : 'downloading';
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', id.toString());
+                await updateDoc(docRef, { dl_status: newStatus });
             }
         }
 
+        // Admin Auth Flow
         async function verifyAdmin() { 
             const pass = await showCustomDialog('prompt', 'Enter Admin Code:', 'Password...');
             if (pass === null) return; 
@@ -714,17 +845,28 @@
             }
         }
         
-        function removeReq(id) { 
-            let data = JSON.parse(localStorage.getItem('mediaRequests') || '[]'); 
-            localStorage.setItem('mediaRequests', JSON.stringify(data.filter(r => r.id !== id))); 
-            renderRequests(); 
+        // Firebase Sync: Delete a single item
+        async function removeReq(id) { 
+            if(!currentUser) return;
+            const appId = "taran-portal"; 
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', id.toString());
+                await deleteDoc(docRef);
+            } catch(e) {
+                console.error("Delete failed.", e);
+            }
         }
 
+        // Firebase Sync: Clear all items
         async function clearAllRequests() { 
+            if(!currentUser) return;
+            const appId = "taran-portal"; 
             const confirmed = await showCustomDialog('confirm', 'Are you sure you want to clear the entire request queue?');
             if(confirmed) { 
-                localStorage.setItem('mediaRequests', '[]'); 
-                renderRequests(); 
+                for (const req of globalRequests) {
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', req.id.toString());
+                    await deleteDoc(docRef);
+                }
             } 
         }
     </script>
