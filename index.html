@@ -88,12 +88,12 @@
         
         // Software Network URLs
         const PLEX_URL = 'https://app.plex.tv/desktop';                     // Points to secure Plex Web App
-        const HFS_URL = 'https://transfer.tarankurtz.com:8443';             // Files URL with explicit port
+        const HFS_URL = 'https://transfer.tarankurtz.com:8443';             // Files URL (Bypasses proxy for huge files to obey TOS)
         const NAS_SETTINGS_URL = 'https://nas.tarankurtz.com';              // Tunnel, no port
         const DOWNLOAD_URL = 'https://download.tarankurtz.com';             // Tunnel, no port
         const SEARCH_URL = 'https://search.tarankurtz.com';                 // Tunnel, no port
         
-        // NEW Rename App URLs
+        // Rename App URLs
         const RENAME_TV_URL = 'https://renametv.tarankurtz.com';
         const RENAME_MOVIE_URL = 'https://renamemovie.tarankurtz.com';
         
@@ -190,13 +190,13 @@
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>Progress</div>
             </div>
 
-            <!-- NEW: TV Rename App Card -->
+            <!-- TV Rename App Card -->
             <div onclick="handleLink(event, RENAME_TV_URL)" onauxclick="handleLink(event, RENAME_TV_URL)" class="dashboard-card rounded-2xl hover:border-teal-500">
                 <div class="text-3xl mb-1 drop-shadow-md">📺</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">TV<br>Rename</div>
             </div>
 
-            <!-- NEW: Movie Rename App Card -->
+            <!-- Movie Rename App Card -->
             <div onclick="handleLink(event, RENAME_MOVIE_URL)" onauxclick="handleLink(event, RENAME_MOVIE_URL)" class="dashboard-card rounded-2xl hover:border-indigo-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🎞️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Movie<br>Rename</div>
@@ -272,7 +272,6 @@
             <button onclick="toggleModal('listModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
             <h2 class="text-xl font-semibold mb-6 text-center text-yellow-400 uppercase tracking-widest drop-shadow-md">Current Queue</h2>
             
-            <!-- Added a loading indicator for the remote DB -->
             <div id="dbLoading" class="text-center text-xs text-zinc-500 mb-2 italic">Syncing with server...</div>
             <ul id="publicRequestList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
             
@@ -344,7 +343,7 @@
     </footer>
 
     <!-- ==============================================
-         APPLICATION LOGIC & SCRIPTS (Firebase Integration)
+         APPLICATION LOGIC & SCRIPTS (Firebase & Plex Integration)
          ============================================== -->
     <!-- Uses Script tags (ES modules via CDN) -->
     <script type="module">
@@ -360,6 +359,9 @@
         // Firebase State Variables
         let db, auth, currentUser;
         let globalRequests = []; 
+
+        // PLEX CHECK API (Integrated to talk to your plexcheck.py script)
+        const PLEX_CHECK_API = 'https://plexcheck.tarankurtz.com/check';
 
         /**
          * 1. App Initialization & Background Rotation
@@ -478,7 +480,6 @@
         window.toggleDownloadState = toggleDownloadState;
         window.verifyAdmin = verifyAdmin;
         window.handleEmailSubmit = handleEmailSubmit;
-        window.runVerification = runVerification; 
         
         /**
          * UI Event Listeners
@@ -648,13 +649,8 @@
                     div.innerHTML = `<span><b>${title}</b> ${yearDisplay}</span> <span class="text-[9px] font-bold text-zinc-500 uppercase">${item.media_type}</span>`;
                     
                     div.onclick = () => {
-                        if (item.media_type === 'tv') {
-                            startTvFlow(item.id, title, year);
-                        } else if (item.media_type === 'person') {
-                            runVerification(title, "", "", "PERSON");
-                        } else {
-                            runVerification(title, year, "", "MOVIE");
-                        }
+                        // Immediately call runVerification so the user sees feedback.
+                        window.runVerification(title, year, "", item.media_type === 'tv' ? 'TV' : item.media_type === 'person' ? 'PERSON' : 'MOVIE', item.id);
                     };
                         
                     results.appendChild(div);
@@ -693,7 +689,7 @@
                             const ep = document.createElement('div'); 
                             ep.className = 'p-2 hover:bg-zinc-700/80 border-b border-zinc-700/50 text-[10px] pl-6 cursor-pointer transition-colors'; 
                             ep.innerText = `Episode ${i}`;
-                            ep.onclick = () => runVerification(title, year, `[S${s.season_number}E${i.toString().padStart(2,'0')}]`, "TV");
+                            ep.onclick = () => window.runVerification(title, year, `[S${s.season_number}E${i.toString().padStart(2,'0')}]`, "TV");
                             box.appendChild(ep);
                         }
                     };
@@ -704,22 +700,52 @@
             }
         }
 
-        // Firebase Sync: Add a new request
-        async function runVerification(title, year, tag, type) {
+        // PLEX CHECK API Communication
+        async function checkPlexAvailability(query) {
+            try {
+                const response = await fetch(`${PLEX_CHECK_API}?query=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                return data;
+            } catch (e) {
+                console.error("Plex check failed", e);
+                return { exists: false };
+            }
+        }
+
+        // Modified Verification: Now checks Plex API before syncing to Firebase!
+        window.runVerification = async function runVerification(title, year, tag, type, id=null) {
+            // Check if it's a TV Show drilldown. If TV, we need to handle the drilldown BEFORE adding to the DB.
+            if (type === 'TV' && tag === "" && id) {
+                 startTvFlow(id, title, year);
+                 return;
+            }
+
             if (!currentUser) return; // Prevent unauthenticated queries
             const appId = "taran-portal"; 
+
+            const msg = document.getElementById('statusMsg');
+            msg.classList.remove('hidden');
+            msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-zinc-800 text-blue-400";
+            msg.innerText = "🔍 Checking Plex...";
+
+            // Check Plex if it is Media (Movie/TV)
+            if (type !== 'PERSON') {
+                const plexStatus = await checkPlexAvailability(title);
+                if (plexStatus && plexStatus.exists) {
+                    msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-500/50";
+                    msg.innerHTML = `✅ Found on Plex!<br><span class="text-[10px] opacity-80">Matching: ${plexStatus.title}</span>`;
+                    return; // Stop here, no need to request
+                }
+            }
             
             let entry = title;
             if (year && type !== 'PERSON') entry += ` (${year})`; 
             if (tag) entry += ` ${tag}`;
             entry += ` - ${type}`;
-
-            const msg = document.getElementById('statusMsg');
-            msg.classList.remove('hidden');
             
             if(globalRequests.some(r => r.title === entry)) {
                 msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-yellow-900/40 text-yellow-400 border border-yellow-700/50";
-                msg.innerText = "⚠️ Already in list!";
+                msg.innerText = "⚠️ Already in Server Queue!";
             } else {
                 try {
                     const newId = Date.now();
@@ -730,9 +756,11 @@
                     msg.innerText = "🚀 Added to Server Queue!";
                 } catch(e) {
                     console.error("Failed to add to database.", e);
+                    msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-red-900/40 text-red-400 border border-red-700/50";
+                    msg.innerText = "❌ Database Error!";
                 }
             }
-        }
+        };
 
         function toggleModal(id) { 
             const m = document.getElementById(id); 
