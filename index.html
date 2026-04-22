@@ -9,8 +9,8 @@
     <!-- iOS and Android specific tags for PWA-like appearance -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
-    <link rel="icon" type="image/jpeg" href="https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
+    <link rel="apple-touch-icon" href="http://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
+    <link rel="icon" type="image/jpeg" href="http://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
 
     <!-- Tailwind CSS for rapid styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -77,7 +77,6 @@
         .modal-fixed-height { height: 520px; display: flex; flex-direction: column; }
     </style>
 </head>
-<!-- Main Body -->
 <body id="mainBody" class="text-white min-h-screen flex flex-col items-center p-6 font-sans">
 
     <!-- Application Configuration Variables -->
@@ -88,7 +87,10 @@
         
         // Software Network URLs
         const PLEX_URL = 'https://app.plex.tv/desktop';                     // Points to secure Plex Web App
-        const HFS_URL = 'http://transfer.tarankurtz.com:8443';             // Files URL (Bypasses proxy for huge files to obey TOS)
+        
+        // HTTP Files URL (Bypasses Cloudflare HTTPS Proxy to avoid large-file TOS violations)
+        const HFS_URL = 'http://transfer.tarankurtz.com:8443';             
+        
         const NAS_SETTINGS_URL = 'https://nas.tarankurtz.com';              // Tunnel, no port
         const DOWNLOAD_URL = 'https://download.tarankurtz.com';             // Tunnel, no port
         const SEARCH_URL = 'https://search.tarankurtz.com';                 // Tunnel, no port
@@ -110,6 +112,9 @@
         // Formspree Endpoints
         const FORMSPREE_PLEX_ENDPOINT = 'https://formspree.io/f/meevzjao';
         const FORMSPREE_UPLOAD_ENDPOINT = 'https://formspree.io/f/mbdqakda';
+
+        // Plex API Checker Endpoint
+        const PLEX_CHECK_API = 'https://plexcheck.tarankurtz.com/check';
     </script>
 
     <!-- Main Content Container -->
@@ -275,7 +280,6 @@
             <div id="dbLoading" class="text-center text-xs text-zinc-500 mb-2 italic">Syncing with server...</div>
             <ul id="publicRequestList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
             
-            <!-- Navigation Controls -->
             <div class="mt-auto flex flex-col gap-2">
                 <button id="toggleActorBtn" onclick="toggleActorView()" class="w-full bg-zinc-800/50 hover:bg-zinc-700 border border-zinc-700/50 py-3 rounded-xl text-[10px] text-zinc-400 hover:text-white uppercase tracking-widest transition-colors">
                     Favorite Actors to Watch
@@ -343,13 +347,28 @@
     </footer>
 
     <!-- ==============================================
-         APPLICATION LOGIC & SCRIPTS (Firebase & Plex Integration)
+         APPLICATION LOGIC & SCRIPTS (Firebase)
          ============================================== -->
-    <!-- Uses Script tags (ES modules via CDN) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // EXPORT TO GLOBAL WINDOW OBJECT FOR INLINE HTML EVENT HANDLERS
+        window.handleLink = handleLink;
+        window.doSearch = doSearch;
+        window.toggleModal = toggleModal;
+        window.openListView = openListView;
+        window.closeRequestModal = closeRequestModal;
+        window.resetSearch = resetSearch;
+        window.backToSeasons = backToSeasons;
+        window.toggleActorView = toggleActorView;
+        window.toggleDownloadState = toggleDownloadState;
+        window.verifyAdmin = verifyAdmin;
+        window.removeReq = removeReq;
+        window.clearAllRequests = clearAllRequests;
+        window.handleEmailSubmit = handleEmailSubmit;
+        window.runVerification = runVerification;
 
         // State Variables
         let adminMode = false; 
@@ -359,9 +378,6 @@
         // Firebase State Variables
         let db, auth, currentUser;
         let globalRequests = []; 
-
-        // PLEX CHECK API (Integrated to talk to your plexcheck.py script)
-        const PLEX_CHECK_API = 'https://plexcheck.tarankurtz.com/check';
 
         /**
          * 1. App Initialization & Background Rotation
@@ -384,7 +400,8 @@
                 localStorage.setItem('portal_last_bg_update', now);
             }
             const bgNum = localStorage.getItem('portalBg') || 1;
-            const bgUrl = `https://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/Background%20-%20${bgNum}.jpg`;
+            // Use HTTP for background images to match the Files URL logic
+            const bgUrl = `http://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/Background%20-%20${bgNum}.jpg`;
             document.getElementById('mainBody').style.backgroundImage = `url('${bgUrl}')`;
 
             checkOnlineStatus();
@@ -392,7 +409,6 @@
 
         /**
          * 2. Firebase Database Initialization
-         * Uses the hardcoded specific config provided
          */
         try {
             const firebaseConfig = {
@@ -411,7 +427,6 @@
             
             const appId = "taran-portal"; 
 
-            // Authenticate anonymously with try-catch block to handle unconfigured Firebase
             const initAuth = async () => {
                 try {
                     await signInAnonymously(auth);
@@ -462,24 +477,6 @@
             const loadingEl = document.getElementById('dbLoading');
             if(loadingEl) loadingEl.innerText = "Database connection failed.";
         }
-
-        /**
-         * 3. Export functions to the Window so inline HTML "onclick" attributes can reach them
-         */
-        window.handleLink = handleLink;
-        window.showCustomDialog = showCustomDialog;
-        window.doSearch = doSearch;
-        window.toggleModal = toggleModal;
-        window.openListView = openListView;
-        window.closeRequestModal = closeRequestModal;
-        window.resetSearch = resetSearch;
-        window.backToSeasons = backToSeasons;
-        window.toggleActorView = toggleActorView;
-        window.removeReq = removeReq;
-        window.clearAllRequests = clearAllRequests;
-        window.toggleDownloadState = toggleDownloadState;
-        window.verifyAdmin = verifyAdmin;
-        window.handleEmailSubmit = handleEmailSubmit;
         
         /**
          * UI Event Listeners
@@ -649,7 +646,6 @@
                     div.innerHTML = `<span><b>${title}</b> ${yearDisplay}</span> <span class="text-[9px] font-bold text-zinc-500 uppercase">${item.media_type}</span>`;
                     
                     div.onclick = () => {
-                        // Immediately call runVerification so the user sees feedback.
                         window.runVerification(title, year, "", item.media_type === 'tv' ? 'TV' : item.media_type === 'person' ? 'PERSON' : 'MOVIE', item.id);
                     };
                         
@@ -672,7 +668,7 @@
                 
                 document.getElementById('backToSeasonBtn').classList.add('hidden');
                 
-                box.innerHTML = `<div class="p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-emerald-500/20" onclick="runVerification('${title}', '${year}', '', 'TV')">Request Full Series</div>`;
+                box.innerHTML = `<div class="p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-emerald-500/20" onclick="window.runVerification('${title}', '${year}', '', 'TV')">Request Full Series</div>`;
                 
                 data.seasons.forEach(s => {
                     if(s.season_number === 0) return; 
@@ -683,7 +679,7 @@
                     
                     d.onclick = () => {
                         document.getElementById('backToSeasonBtn').classList.remove('hidden');
-                        box.innerHTML = `<div class="p-3 bg-blue-600/20 hover:bg-blue-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-blue-500/20" onclick="runVerification('${title}', '${year}', '[Season ${s.season_number}]', 'TV')">Request Entire Season ${s.season_number}</div>`;
+                        box.innerHTML = `<div class="p-3 bg-blue-600/20 hover:bg-blue-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-blue-500/20" onclick="window.runVerification('${title}', '${year}', '[Season ${s.season_number}]', 'TV')">Request Entire Season ${s.season_number}</div>`;
                         
                         for(let i=1; i<=s.episode_count; i++) {
                             const ep = document.createElement('div'); 
@@ -701,9 +697,11 @@
         }
 
         // PLEX CHECK API Communication
-        async function checkPlexAvailability(query) {
+        // Now accurately passes the YEAR to the Python Script
+        async function checkPlexAvailability(query, year) {
             try {
-                const response = await fetch(`${PLEX_CHECK_API}?query=${encodeURIComponent(query)}`);
+                // Attach both query and year to the API fetch to guarantee strict matching
+                const response = await fetch(`${PLEX_CHECK_API}?query=${encodeURIComponent(query)}&year=${encodeURIComponent(year || '')}`);
                 const data = await response.json();
                 return data;
             } catch (e) {
@@ -712,15 +710,14 @@
             }
         }
 
-        // Modified Verification: Now checks Plex API before syncing to Firebase!
-        window.runVerification = async function runVerification(title, year, tag, type, id=null) {
-            // Check if it's a TV Show drilldown. If TV, we need to handle the drilldown BEFORE adding to the DB.
+        // Firebase Sync & Plex Check
+        async function runVerification(title, year, tag, type, id=null) {
             if (type === 'TV' && tag === "" && id) {
                  startTvFlow(id, title, year);
                  return;
             }
 
-            if (!currentUser) return; // Prevent unauthenticated queries
+            if (!currentUser) return; 
             const appId = "taran-portal"; 
 
             const msg = document.getElementById('statusMsg');
@@ -728,13 +725,13 @@
             msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-zinc-800 text-blue-400";
             msg.innerText = "🔍 Checking Plex...";
 
-            // Check Plex if it is Media (Movie/TV)
+            // Check Plex strictly by passing BOTH Title and Year!
             if (type !== 'PERSON') {
-                const plexStatus = await checkPlexAvailability(title);
+                const plexStatus = await checkPlexAvailability(title, year);
                 if (plexStatus && plexStatus.exists) {
                     msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-500/50";
-                    msg.innerHTML = `✅ Found on Plex!<br><span class="text-[10px] opacity-80">Matching: ${plexStatus.title}</span>`;
-                    return; // Stop here, no need to request
+                    msg.innerHTML = `✅ Found on Plex!<br><span class="text-[10px] opacity-80">Matching: ${plexStatus.title} (${plexStatus.year})</span>`;
+                    return; 
                 }
             }
             
@@ -760,7 +757,7 @@
                     msg.innerText = "❌ Database Error!";
                 }
             }
-        };
+        }
 
         function toggleModal(id) { 
             const m = document.getElementById(id); 
@@ -796,9 +793,6 @@
             renderRequests();
         }
 
-        /**
-         * Dynamic Data Rendering using the globalRequests array synced from Firebase
-         */
         function renderRequests() {
             const reqList = document.getElementById('publicRequestList');
             const dlList = document.getElementById('downloaderTaskList');
@@ -848,7 +842,6 @@
             }
         }
 
-        // Firebase Sync: Update Download Checkbox
         async function toggleDownloadState(id) {
             if(!currentUser) return;
             const appId = "taran-portal"; 
@@ -860,7 +853,6 @@
             }
         }
 
-        // Admin Auth Flow
         async function verifyAdmin() { 
             const pass = await showCustomDialog('prompt', 'Enter Admin Code:', 'Password...');
             if (pass === null) return; 
@@ -873,7 +865,6 @@
             }
         }
         
-        // Firebase Sync: Delete a single item
         async function removeReq(id) { 
             if(!currentUser) return;
             const appId = "taran-portal"; 
@@ -885,7 +876,6 @@
             }
         }
 
-        // Firebase Sync: Clear all items
         async function clearAllRequests() { 
             if(!currentUser) return;
             const appId = "taran-portal"; 
