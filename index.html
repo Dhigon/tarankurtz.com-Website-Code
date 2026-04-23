@@ -9,31 +9,27 @@
     <!-- iOS and Android specific tags for PWA-like appearance -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="assets/images/ICON.jpg"> <!-- Points to local GitHub repo folder -->
-    <link rel="icon" type="image/jpeg" href="assets/images/ICON.jpg"> <!-- Points to local GitHub repo folder -->
+    <link rel="apple-touch-icon" href="assets/images/ICON.jpg"> 
+    <link rel="icon" type="image/jpeg" href="assets/images/ICON.jpg">
 
     <!-- Tailwind CSS for rapid styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Custom Styles -->
     <style>
-        /* Custom scrollbar for a sleek look */
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
         
-        /* Main background styling: The actual image is set dynamically by JavaScript */
         #mainBody { 
             background-size: cover; 
             background-position: center; 
             background-attachment: fixed; 
-            background-color: #09090b; /* Fallback color */
-            transition: background-image 1s ease-in-out; /* Smooth transition when rotating backgrounds */
+            background-color: #09090b;
+            transition: background-image 1s ease-in-out; 
         }
 
-        /* Server status indicator dot */
         .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         
-        /* Dashboard Card Styling - Enhanced for "Glass Pane" effect */
         .dashboard-card { 
             height: 140px; 
             display: flex; 
@@ -44,10 +40,9 @@
             cursor: pointer; 
             transition: all 0.3s ease; 
             z-index: 20; 
-            /* Glassmorphism properties */
-            background-color: rgba(24, 24, 27, 0.45); /* bg-zinc-900/45 */
+            background-color: rgba(24, 24, 27, 0.45); 
             backdrop-filter: blur(12px); 
-            border: 1px solid rgba(63, 63, 70, 0.5); /* border-zinc-700/50 */
+            border: 1px solid rgba(63, 63, 70, 0.5); 
         }
         .dashboard-card:hover {
             background-color: rgba(24, 24, 27, 0.65);
@@ -55,7 +50,6 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
         
-        /* Search input reset to prevent browser autofill styling issues */
         #mainSearch, #mainSearch:focus, #mainSearch:active, #mainSearch:-webkit-autofill { 
             outline: none !important; box-shadow: none !important; border: none !important; 
             background: transparent !important; background-color: transparent !important;
@@ -63,7 +57,6 @@
             transition: background-color 5000s ease-in-out 0s; appearance: none !important; 
         }
 
-        /* Tooltip styling for the help section */
         .help-content { 
             opacity: 0; visibility: hidden; transition: all 0.3s ease; pointer-events: none;
             position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%) translateY(10px);
@@ -72,65 +65,46 @@
             opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0px); 
         }
 
-        /* Miscellaneous utilities */
         .brand-icon { width: 42px; height: 42px; object-fit: contain; margin-bottom: 8px; }
         .modal-fixed-height { height: 520px; display: flex; flex-direction: column; }
     </style>
 </head>
 <body id="mainBody" class="text-white min-h-screen flex flex-col items-center p-6 font-sans">
 
-    <!-- Application Configuration Variables -->
     <script>
         /* Configuration Section */
         const TITLE_HEADERS = ["Taran's Territory", "Taran's Threshold", "Taran's Turnpike", "Taran's Town", "Taran's Tryst", "Taran's Tableau", "Taran's Track", "Taran's Terrain", "Taran's Tower", "Taran's Treasure-Trove", "Taran's Touchpoint", "Taran's Trading-Post", "Taran's Thoroughfare", "Kiki's Keep", "Kiki's Keyhole", "Kiki's Knot", "Kiki's Kinship", "Kiki's Kaleidoscope", "Kiki's Korner", "Kiki's Kerb", "Kiki's Knack", "Kiki's Kiln", "Kiki's Kernel", "Kiki's Keystone", "Kenzie's Kaleidoscope", "Kenzie's Knot", "Kenzie's Keep", "Kenzie's Key", "Kenzie's Korner", "Mackenzie's Meeting-Point", "Mackenzie's Mainstay", "Mackenzie's Map", "Mackenzie's Mission-Control", "Mackenzie's Manor", "Mackenzie's Meadow", "Mackenzie's Milestone", "Mackenzie's Meridian", "Mackenzie's Mezzanine", "Mackenzie's Motif", "Taran & Kiki's Kin", "The Taran & Kenzie Connection", "The Taran & Kenzie Knot", "Taran's & Kiki's Key-Point", "The Taran & Mackenzie Meeting-Hub"];
         const TMDB_KEY = '016c19fa578a651dfbd937a4a5fc8323';
         
-        // Software Network URLs
-        const PLEX_URL = 'https://app.plex.tv/desktop';                     // Points to secure Plex Web App
-        
-        // HTTP Files URL (Routed securely via Nginx Proxy Manager)
-        const HFS_URL = 'https://transfer.tarankurtz.com';                  
-        
-        const NAS_SETTINGS_URL = 'https://nas.tarankurtz.com';              // Tunnel, no port
-        const DOWNLOAD_URL = 'https://download.tarankurtz.com';             // Tunnel, no port
-        const SEARCH_URL = 'https://search.tarankurtz.com';                 // Tunnel, no port
-        
-        // Rename App URLs
+        const PLEX_URL = 'https://app.plex.tv/desktop';
+        const HFS_URL = 'https://transfer.tarankurtz.com';
+        const NAS_SETTINGS_URL = 'https://nas.tarankurtz.com';
+        const DOWNLOAD_URL = 'https://download.tarankurtz.com';
+        const SEARCH_URL = 'https://search.tarankurtz.com';
         const RENAME_TV_URL = 'https://renametv.tarankurtz.com';
         const RENAME_MOVIE_URL = 'https://renamemovie.tarankurtz.com';
         
+        // Internal Admin Tools
         const ROUTER_URL = 'http://192.168.1.254';
+        const NPM_URL = 'http://192.168.1.77:81';
+        const UPTIME_KUMA_URL = 'http://192.168.1.77:3001';
         const CLOUDFLARE_URL = 'https://dash.cloudflare.com/03c14d743f0edb4784c1a97f7214f300/home/overview';
         
-        // Background Image Array (UPDATE these exact filenames to match what you upload to GitHub!)
+        // Background Image List (Exact filenames in assets/images/)
         const BACKGROUND_IMAGES = [
-            //"Background - Space.jpg",
-            //"Background - City.jpg",
-            //"Background - Nature.jpg",
-            //"Background - Abstract.jpg",
-            //"Background - Ocean.jpg",
-            "Background - Dragon Ball - Goku and Chichi in sunset.jpg",
-            "Background - Dragon Ball - Goku Black.jpg",
-            "Background - 3Dragon Ball - Goku God Unleashed.jpg",
-
+            "Background - 01 (Space).jpg",
+            "Background - 02 (City).jpg",
+            "Background - 03 (Nature).jpg",
+            "Background - 04 (Abstract).jpg",
+            "Background - 05 (Ocean).jpg"
         ];
         
-        // Admin & Backend Services
         const ADMIN_PASS = 'Potatoes2!'; 
         const GITHUB_CODE_URL = 'https://github.com/Dhigon/personal-template-web/blob/main/index.html';
-        
-        // Formspree Endpoints
-        const FORMSPREE_PLEX_ENDPOINT = 'https://formspree.io/f/meevzjao';
-        const FORMSPREE_UPLOAD_ENDPOINT = 'https://formspree.io/f/mbdqakda';
-
-        // Plex API Checker Endpoint
         const PLEX_CHECK_API = 'https://plexcheck.tarankurtz.com/check';
     </script>
 
-    <!-- Main Content Container -->
     <main class="flex-1 flex flex-col items-center justify-center w-full max-w-4xl py-10">
-        
-        <!-- Header Text -->
         <div class="text-center mb-4">
             <p class="text-[10px] tracking-[0.3em] uppercase text-zinc-300 font-bold drop-shadow-md">tarankurtz.com</p>
             <p class="text-[9px] tracking-widest uppercase text-zinc-400 drop-shadow-md">- A Server for Friends and Family -</p>
@@ -138,7 +112,6 @@
 
         <h1 id="editableTitle" class="text-3xl font-light tracking-widest mb-10 text-center uppercase drop-shadow-lg">Taran's Portal</h1>
 
-        <!-- Search Bar Container -->
         <div class="w-full max-w-2xl mb-12">
             <div class="flex items-center bg-zinc-900/60 backdrop-blur-xl border border-zinc-700/50 rounded-full px-2 py-2 shadow-2xl focus-within:border-zinc-500 transition-all">
                 <input type="text" id="mainSearch" onkeydown="if(event.key==='Enter') doSearch('google')" placeholder="Search or ask AI..." class="flex-1 py-2 px-6 text-base">
@@ -148,9 +121,7 @@
             </div>
         </div>
 
-        <!-- Dashboard Grid Cards - 10 cards in a 4-column layout -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full mb-12">
-            
             <!-- HFS Files Card -->
             <div onclick="handleLink(event, HFS_URL)" onauxclick="handleLink(event, HFS_URL)" class="dashboard-card rounded-2xl hover:border-blue-500">
                 <div id="hfsStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-400 italic">Checking...</div>
@@ -167,51 +138,43 @@
                 <span onclick="event.stopPropagation(); toggleModal('emailModal');" onauxclick="event.stopPropagation();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-orange-400 z-50 transition-colors">Request Access</span>
             </div>
 
-            <!-- YouTube Card -->
             <div onclick="handleLink(event, 'https://youtube.com')" onauxclick="handleLink(event, 'https://youtube.com')" class="dashboard-card rounded-2xl hover:border-red-600">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="brand-icon drop-shadow-md" alt="YouTube">
                 <div class="text-[11px] uppercase tracking-widest font-bold">YouTube</div>
             </div>
 
-            <!-- Google Remote Desktop Card -->
             <div onclick="handleLink(event, 'https://remotedesktop.google.com/access')" onauxclick="handleLink(event, 'https://remotedesktop.google.com/access')" class="dashboard-card rounded-2xl hover:border-blue-400">
                 <div class="text-3xl mb-1 drop-shadow-md">🖥️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Remote</div>
             </div>
 
-            <!-- NAS Settings Card -->
             <div onclick="handleLink(event, NAS_SETTINGS_URL)" onauxclick="handleLink(event, NAS_SETTINGS_URL)" class="dashboard-card rounded-2xl hover:border-zinc-400">
                 <div class="text-3xl mb-1 drop-shadow-md">⚙️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-2">NAS Settings</div>
             </div>
 
-            <!-- Media Request Tool Card -->
             <div onclick="toggleModal('requestModal')" class="dashboard-card rounded-2xl hover:border-emerald-500">
                 <div class="text-3xl mb-1 drop-shadow-md">📥</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Request</div>
                 <span onclick="event.stopPropagation(); openListView();" class="absolute bottom-2 text-[9px] text-zinc-400 underline uppercase tracking-widest hover:text-white z-50 transition-colors">View List</span>
             </div>
 
-            <!-- Search Downloads Card -->
             <div onclick="handleLink(event, SEARCH_URL)" onauxclick="handleLink(event, SEARCH_URL)" class="dashboard-card rounded-2xl hover:border-pink-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🔍</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Search</div>
                 <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-widest z-50">Downloads</span>
             </div>
 
-            <!-- Download Progress Modal Card -->
             <div onclick="toggleModal('downloaderModal')" class="dashboard-card rounded-2xl hover:border-purple-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🧲</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>Progress</div>
             </div>
 
-            <!-- TV Rename App Card -->
             <div onclick="handleLink(event, RENAME_TV_URL)" onauxclick="handleLink(event, RENAME_TV_URL)" class="dashboard-card rounded-2xl hover:border-teal-500">
                 <div class="text-3xl mb-1 drop-shadow-md">📺</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">TV<br>Rename</div>
             </div>
 
-            <!-- Movie Rename App Card -->
             <div onclick="handleLink(event, RENAME_MOVIE_URL)" onauxclick="handleLink(event, RENAME_MOVIE_URL)" class="dashboard-card rounded-2xl hover:border-indigo-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🎞️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Movie<br>Rename</div>
@@ -219,20 +182,15 @@
         </div>
     </main>
 
-    <!-- ==============================================
-         MODALS & DIALOGS SECTION 
-         ============================================== -->
-
-    <!-- Files Upload Access Form Modal -->
+    <!-- Modals -->
     <div id="uploadAccessModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[150] p-4">
         <div class="w-full max-w-sm bg-zinc-900/95 border border-blue-700/50 p-8 rounded-3xl relative shadow-2xl backdrop-blur-md">
             <button onclick="toggleModal('uploadAccessModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
-            <h2 class="text-xl font-semibold mb-2 text-center text-blue-400 uppercase tracking-widest drop-shadow-md">Upload Access</h2>
+            <h2 class="text-xl font-semibold mb-2 text-center text-blue-400 uppercase tracking-widest drop-shadow-md">Full Access</h2>
             <p class="text-[10px] text-zinc-400 text-center mb-6">What do you want your Username and Password to be?</p>
-            
             <form id="uploadAccessForm" action="https://formspree.io/f/mbdqakda" method="POST" onsubmit="handleEmailSubmit(event, 'uploadStatusMsg', 'uploadAccessModal')" class="flex flex-col gap-4">
-                <input type="hidden" name="subject" value="New Files Upload Access Request">
-                <input type="email" name="email" required placeholder="your.email@example.com (for reply)" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-blue-500 transition-colors">
+                <input type="hidden" name="subject" value="New Files Full Access Request">
+                <input type="email" name="email" required placeholder="your.email@example.com" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-blue-500 transition-colors">
                 <input type="text" name="requested_credentials" required placeholder="[USER]:[PASS]" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-blue-500 transition-colors">
                 <button type="submit" class="w-full bg-blue-600/80 hover:bg-blue-500 py-3 rounded-xl text-[11px] text-white uppercase tracking-widest font-bold transition-all mt-2">Send Request</button>
                 <div id="uploadStatusMsg" class="text-center text-xs hidden mt-2 font-bold"></div>
@@ -240,13 +198,11 @@
         </div>
     </div>
 
-    <!-- Plex Email Access Form Modal -->
     <div id="emailModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[150] p-4">
         <div class="w-full max-w-sm bg-zinc-900/95 border border-orange-700/50 p-8 rounded-3xl relative shadow-2xl backdrop-blur-md">
             <button onclick="toggleModal('emailModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
             <h2 class="text-xl font-semibold mb-2 text-center text-orange-400 uppercase tracking-widest drop-shadow-md">Plex Access</h2>
             <p class="text-[10px] text-zinc-400 text-center mb-6">Enter your email to request an invite.</p>
-            
             <form id="plexEmailForm" action="https://formspree.io/f/meevzjao" method="POST" onsubmit="handleEmailSubmit(event, 'emailStatusMsg', 'emailModal')" class="flex flex-col gap-4">
                 <input type="hidden" name="subject" value="New Plex Access Request">
                 <input type="email" name="email" required placeholder="your.email@example.com" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-orange-500 transition-colors">
@@ -256,72 +212,72 @@
         </div>
     </div>
 
-    <!-- Media Request Creation Modal -->
     <div id="requestModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
         <div class="w-full max-w-md bg-zinc-900/90 border border-zinc-700/50 p-8 rounded-3xl relative modal-fixed-height shadow-2xl backdrop-blur-md">
             <button onclick="closeRequestModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
             <h2 class="text-xl font-semibold mb-6 text-center text-emerald-400 uppercase tracking-widest drop-shadow-md">Media Request</h2>
             
+            <!-- Standard TMDB Search Container -->
             <div id="searchContainer" class="flex flex-col flex-1 overflow-hidden">
                 <input type="text" id="movieSearch" placeholder="Search Movie/TV/Person..." class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-emerald-500 transition-colors">
                 <div id="results" class="mt-4 bg-zinc-800/80 border border-zinc-700 rounded-xl hidden overflow-y-auto"></div>
+                <button onclick="toggleCustomRequest()" class="mt-4 text-[10px] text-zinc-500 hover:text-emerald-400 underline uppercase tracking-widest transition-colors self-center">Not finding it? Add Custom Item</button>
             </div>
 
+            <!-- TV Drilldown Container -->
             <div id="drillDownContainer" class="hidden flex flex-col flex-1 overflow-hidden">
-                <div id="drillDownResults" class="bg-zinc-800/80 border border-zinc-700 rounded-xl overflow-y-auto flex-1 custom-scrollbar"></div>
+                <div id="drillDownResults" class="bg-zinc-800/80 border border-zinc-700 rounded-xl overflow-y-auto flex-1"></div>
                 <div class="flex gap-2 mt-4">
                     <button id="backToSeasonBtn" onclick="backToSeasons()" class="hidden flex-1 py-2 text-xs text-blue-400 border border-blue-900/50 hover:bg-blue-900/20 rounded-lg uppercase transition-colors">← Back</button>
                     <button onclick="resetSearch()" class="flex-1 py-2 text-xs text-red-500 border border-red-900/40 hover:bg-red-900/20 rounded-lg uppercase transition-colors">Restart</button>
                 </div>
             </div>
 
+            <!-- Custom Request Container -->
+            <div id="customRequestContainer" class="hidden flex flex-col flex-1 overflow-hidden mt-4">
+                <p class="text-center text-[10px] text-zinc-400 mb-3 uppercase tracking-widest">Add Books, Comics, or Other Items</p>
+                <input type="text" id="customItemInput" placeholder="Enter Item Name..." class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl py-3 px-4 text-white outline-none focus:border-emerald-500 transition-colors">
+                <button onclick="submitCustomItem()" class="mt-4 w-full py-3 bg-emerald-600/80 hover:bg-emerald-500 rounded-xl text-[11px] text-white uppercase tracking-widest font-bold transition-all">Submit Custom Request</button>
+                <button onclick="toggleCustomRequest()" class="mt-4 text-[10px] text-zinc-500 hover:text-white underline uppercase tracking-widest transition-colors self-center">Back to Media Search</button>
+            </div>
+
             <div id="statusMsg" class="mt-4 p-3 rounded-xl text-center text-sm hidden font-bold shadow-inner"></div>
-            
             <button onclick="closeRequestModal(); openListView();" class="mt-auto w-full py-3 bg-zinc-800/50 border border-zinc-700 hover:border-emerald-500/50 rounded-xl text-[10px] text-zinc-400 hover:text-emerald-400 uppercase tracking-widest transition-all">Open Request Queue</button>
         </div>
     </div>
 
-    <!-- Active Media Requests List Modal -->
     <div id="listModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
         <div class="w-full max-w-md bg-zinc-900/90 border border-zinc-700/50 p-8 rounded-3xl relative flex flex-col modal-fixed-height shadow-2xl backdrop-blur-md">
             <button onclick="toggleModal('listModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
             <h2 class="text-xl font-semibold mb-6 text-center text-yellow-400 uppercase tracking-widest drop-shadow-md">Current Queue</h2>
-            
             <div id="dbLoading" class="text-center text-xs text-zinc-500 mb-2 italic">Syncing with server...</div>
             <ul id="publicRequestList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
-            
             <div class="mt-auto flex flex-col gap-2">
-                <button id="toggleActorBtn" onclick="toggleActorView()" class="w-full bg-zinc-800/50 hover:bg-zinc-700 border border-zinc-700/50 py-3 rounded-xl text-[10px] text-zinc-400 hover:text-white uppercase tracking-widest transition-colors">
+                <button id="toggleActorBtn" onclick="cycleViewMode()" class="w-full bg-zinc-800/50 hover:bg-zinc-700 border border-zinc-700/50 py-3 rounded-xl text-[10px] text-zinc-400 hover:text-white uppercase tracking-widest transition-colors">
                     Favorite Actors to Watch
                 </button>
-                
                 <button onclick="toggleModal('listModal'); toggleModal('requestModal');" class="w-full bg-emerald-900/20 hover:bg-emerald-900/40 border border-emerald-700/30 hover:border-emerald-500/50 py-3 rounded-xl text-[10px] text-emerald-500 hover:text-emerald-400 uppercase tracking-widest transition-all">
                     Return to Request Form
                 </button>
             </div>
-
             <div id="adminListControls" class="hidden mt-4">
                 <button onclick="clearAllRequests()" class="w-full bg-red-900/30 hover:bg-red-900/50 text-red-500 py-3 rounded-xl text-[10px] border border-red-900/50 uppercase transition-colors">Clear All</button>
             </div>
         </div>
     </div>
 
-    <!-- Downloader Action Modal -->
     <div id="downloaderModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
         <div class="w-full max-w-md bg-zinc-900/90 border border-purple-700/30 p-8 rounded-3xl relative flex flex-col modal-fixed-height shadow-2xl backdrop-blur-md">
             <button onclick="toggleModal('downloaderModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
             <h2 class="text-xl font-semibold mb-2 text-center text-purple-400 uppercase tracking-widest drop-shadow-md">Download Progress</h2>
             <p class="text-[10px] text-zinc-400 text-center uppercase tracking-widest mb-6">Check off items to begin search/download</p>
-            
             <ul id="downloaderTaskList" class="space-y-2 overflow-y-auto flex-1 mb-4 pr-2"></ul>
-            
             <button onclick="window.open(DOWNLOAD_URL, '_blank')" class="w-full bg-purple-900/30 hover:bg-purple-900/50 border border-purple-700/50 py-3 rounded-xl text-[10px] text-purple-300 hover:text-white uppercase tracking-widest transition-colors">
                 Open WebUI
             </button>
         </div>
     </div>
 
-    <!-- Universal Custom Dialog Box -->
     <div id="customDialogModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[200] p-4">
         <div class="bg-zinc-900/95 border border-zinc-700 p-6 rounded-2xl max-w-sm w-full text-center shadow-2xl backdrop-blur-xl">
             <p id="dialogMessage" class="mb-5 text-sm text-zinc-200 tracking-wide"></p>
@@ -333,11 +289,7 @@
         </div>
     </div>
 
-    <!-- ==============================================
-         FOOTER SECTION 
-         ============================================== -->
     <footer class="mt-auto py-10 w-full flex flex-col items-center gap-6 z-50">
-        
         <div class="help-trigger relative group">
             <span class="text-zinc-400 text-[10px] tracking-[0.3em] cursor-help uppercase hover:text-white transition-colors">Mobile App Setup</span>
             <div class="help-content w-64 bg-zinc-900/95 border border-zinc-700/50 p-4 rounded-2xl shadow-2xl text-center text-[10px] text-zinc-300 backdrop-blur-xl">
@@ -350,21 +302,19 @@
             <button onclick="verifyAdmin()" id="adminBtn" class="text-zinc-600 text-[9px] tracking-[0.4em] uppercase hover:text-zinc-400 transition-colors py-2 px-4 rounded-lg hover:bg-zinc-800/30">Admin Portal</button>
             <div id="adminControls" class="hidden flex flex-wrap justify-center gap-4 mt-2">
                 <button onclick="handleLink(event, GITHUB_CODE_URL, true)" onauxclick="handleLink(event, GITHUB_CODE_URL, true)" class="text-emerald-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-emerald-400 hover:underline transition-all">Website Code</button>
+                <button onclick="handleLink(event, NPM_URL, true)" onauxclick="handleLink(event, NPM_URL, true)" class="text-zinc-400/80 text-[9px] tracking-[0.2em] uppercase hover:text-white hover:underline transition-all">NPM Settings</button>
                 <button onclick="handleLink(event, ROUTER_URL, true)" onauxclick="handleLink(event, ROUTER_URL, true)" class="text-blue-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-blue-400 hover:underline transition-all">Router</button>
                 <button onclick="handleLink(event, CLOUDFLARE_URL, true)" onauxclick="handleLink(event, CLOUDFLARE_URL, true)" class="text-orange-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-orange-400 hover:underline transition-all">CloudFlare</button>
+                <button onclick="handleLink(event, UPTIME_KUMA_URL, true)" onauxclick="handleLink(event, UPTIME_KUMA_URL, true)" class="text-purple-500/80 text-[9px] tracking-[0.2em] uppercase hover:text-purple-400 hover:underline transition-all">Uptime Kuma</button>
             </div>
         </div>
     </footer>
 
-    <!-- ==============================================
-         APPLICATION LOGIC & SCRIPTS (Firebase)
-         ============================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // EXPORT TO GLOBAL WINDOW OBJECT FOR INLINE HTML EVENT HANDLERS
         window.handleLink = handleLink;
         window.doSearch = doSearch;
         window.toggleModal = toggleModal;
@@ -372,29 +322,24 @@
         window.closeRequestModal = closeRequestModal;
         window.resetSearch = resetSearch;
         window.backToSeasons = backToSeasons;
-        window.toggleActorView = toggleActorView;
+        window.cycleViewMode = cycleViewMode;
         window.toggleDownloadState = toggleDownloadState;
         window.verifyAdmin = verifyAdmin;
         window.removeReq = removeReq;
         window.clearAllRequests = clearAllRequests;
         window.handleEmailSubmit = handleEmailSubmit;
         window.runVerification = runVerification;
+        window.toggleCustomRequest = toggleCustomRequest;
+        window.submitCustomItem = submitCustomItem;
 
-        // State Variables
         let adminMode = false; 
         let selectedShow = null;
-        let viewingActors = false; 
-        
-        // Firebase State Variables
+        let currentViewMode = 'MEDIA'; // Cycle between 'MEDIA', 'ACTORS', 'CUSTOM'
         let db, auth, currentUser;
         let globalRequests = []; 
 
-        /**
-         * 1. App Initialization & Background Rotation
-         */
         (function init() {
             const now = Date.now();
-
             const lastTitleUpdate = parseInt(localStorage.getItem('portal_last_title_update') || 0);
             if (now - lastTitleUpdate > 15 * 60 * 1000) {
                 const randomTitle = TITLE_HEADERS[Math.floor(Math.random() * TITLE_HEADERS.length)];
@@ -405,25 +350,18 @@
 
             const lastBgUpdate = parseInt(localStorage.getItem('portal_last_bg_update') || 0);
             if (now - lastBgUpdate > 30 * 60 * 1000 || !localStorage.getItem('portalBg')) {
-                // Select a random index from our new array
                 const randomBgIndex = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
                 localStorage.setItem('portalBg', randomBgIndex);
                 localStorage.setItem('portal_last_bg_update', now);
             }
             const bgIndex = localStorage.getItem('portalBg') || 0;
-            // Fallback to index 0 just in case the array size changes
             const bgFileName = BACKGROUND_IMAGES[bgIndex] || BACKGROUND_IMAGES[0];
-            
-            // Points to GitHub Repo assets/images folder now for reliable access
             const bgUrl = `assets/images/${bgFileName}`; 
             document.getElementById('mainBody').style.backgroundImage = `url('${bgUrl}')`;
 
             checkOnlineStatus();
         })();
 
-        /**
-         * 2. Firebase Database Initialization
-         */
         try {
             const firebaseConfig = {
                 apiKey: "AIzaSyDSYd-a-xZP_rGZB2aXKze0m3tL5xCf-cc",
@@ -434,95 +372,35 @@
                 appId: "1:824697993687:web:04d5fa0ef62c911b123392",
                 measurementId: "G-KVN29VS52Y"
             };
-
             const app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            
             const appId = "taran-portal"; 
 
             const initAuth = async () => {
-                try {
-                    await signInAnonymously(auth);
-                } catch (error) {
-                    console.error("Firebase Authentication Error:", error);
-                    const loadingEl = document.getElementById('dbLoading');
-                    if (loadingEl) {
-                        loadingEl.classList.remove('hidden');
-                        if (error.code === 'auth/configuration-not-found') {
-                            loadingEl.innerText = "Auth Error: Please click 'Get Started' in the Authentication tab of your Firebase Console.";
-                        } else if (error.code === 'auth/operation-not-allowed') {
-                            loadingEl.innerText = "Auth Error: Please enable the 'Anonymous' sign-in provider in your Firebase Console.";
-                        } else {
-                            loadingEl.innerText = "Database connection failed: " + error.message;
-                        }
-                    }
-                }
+                try { await signInAnonymously(auth); } catch (e) {}
             };
-            
             initAuth();
 
-            // Listen for Real-Time Changes
             onAuthStateChanged(auth, (user) => {
                 currentUser = user;
                 if (user) {
                     const reqRef = collection(db, 'artifacts', appId, 'public', 'data', 'mediaRequests');
-                    
                     onSnapshot(reqRef, (snapshot) => {
                         globalRequests = [];
-                        snapshot.forEach(doc => {
-                            globalRequests.push(doc.data());
-                        });
-                        
+                        snapshot.forEach(doc => globalRequests.push(doc.data()));
                         globalRequests.sort((a, b) => a.id - b.id);
-                        
                         document.getElementById('dbLoading').classList.add('hidden');
                         renderRequests(); 
-                    }, (error) => {
-                        console.error("Firestore sync error:", error);
-                        const loadingEl = document.getElementById('dbLoading');
-                        if(loadingEl) loadingEl.innerText = "Sync failed. Check Firebase rules.";
-                    });
+                    }, (error) => {});
                 }
             });
-
-        } catch (e) {
-            console.error("Firebase initialization failed.", e);
-            const loadingEl = document.getElementById('dbLoading');
-            if(loadingEl) loadingEl.innerText = "Database connection failed.";
-        }
+        } catch (e) {}
         
-        /**
-         * UI Event Listeners
-         */
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const rModal = document.getElementById('requestModal');
-                const lModal = document.getElementById('listModal');
-                const dModal = document.getElementById('downloaderModal');
-                const eModal = document.getElementById('emailModal');
-                const uModal = document.getElementById('uploadAccessModal');
-                
-                if (!rModal.classList.contains('hidden')) closeRequestModal();
-                if (!lModal.classList.contains('hidden')) toggleModal('listModal');
-                if (!dModal.classList.contains('hidden')) toggleModal('downloaderModal');
-                if (!eModal.classList.contains('hidden')) toggleModal('emailModal');
-                if (!uModal.classList.contains('hidden')) toggleModal('uploadAccessModal');
-            }
-        });
-
         async function handleEmailSubmit(event, statusMsgId, modalId) {
             event.preventDefault(); 
             const form = event.target;
             const statusMsg = document.getElementById(statusMsgId);
-            
-            if (form.action.includes('YOUR_FORM_ID')) {
-                statusMsg.className = "text-center text-xs mt-3 font-bold text-red-400";
-                statusMsg.innerText = "Error: Admin needs to configure Formspree URL in code.";
-                statusMsg.classList.remove('hidden');
-                return;
-            }
-
             const data = new FormData(form);
             try {
                 const response = await fetch(form.action, {
@@ -530,7 +408,6 @@
                     body: data,
                     headers: { 'Accept': 'application/json' }
                 });
-                
                 if (response.ok) {
                     statusMsg.className = "text-center text-xs mt-3 font-bold text-emerald-400";
                     statusMsg.innerText = "Request sent successfully!";
@@ -539,12 +416,12 @@
                     setTimeout(() => { toggleModal(modalId); statusMsg.classList.add('hidden'); }, 2000);
                 } else {
                     statusMsg.className = "text-center text-xs mt-3 font-bold text-red-400";
-                    statusMsg.innerText = "Oops! There was a problem sending the request.";
+                    statusMsg.innerText = "Oops! Problem sending request.";
                     statusMsg.classList.remove('hidden');
                 }
             } catch (error) {
                 statusMsg.className = "text-center text-xs mt-3 font-bold text-red-400";
-                statusMsg.innerText = "Network error. Please try again.";
+                statusMsg.innerText = "Network error.";
                 statusMsg.classList.remove('hidden');
             }
         }
@@ -553,8 +430,7 @@
             if (e.type === 'click' && e.button === 0) {
                 if (forceNewTab || e.ctrlKey || e.metaKey) window.open(url, '_blank');
                 else window.location.href = url;
-            } 
-            else if (e.type === 'auxclick' && e.button === 1) {
+            } else if (e.type === 'auxclick' && e.button === 1) {
                 window.open(url, '_blank');
             }
         }
@@ -566,11 +442,9 @@
                 const inputEl = document.getElementById('dialogInput');
                 const cancelBtn = document.getElementById('dialogCancelBtn');
                 const confirmBtn = document.getElementById('dialogConfirmBtn');
-
                 msgEl.innerText = message;
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
-
                 if (type === 'prompt') {
                     inputEl.value = '';
                     inputEl.placeholder = placeholder;
@@ -587,37 +461,28 @@
                     cancelBtn.classList.add('hidden');
                     confirmBtn.innerText = 'OK';
                 }
-
                 const closeDialog = (val) => {
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
-                    cancelBtn.onclick = null;
-                    confirmBtn.onclick = null;
                     resolve(val);
                 };
-
                 cancelBtn.onclick = () => closeDialog(null);
                 confirmBtn.onclick = () => {
                     if (type === 'prompt') closeDialog(inputEl.value);
-                    else if (type === 'confirm') closeDialog(true);
                     else closeDialog(true);
                 };
             });
         }
 
         async function checkOnlineStatus() {
-            // Check HFS local
             fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' })
                 .then(() => setStatus('hfsStatus', true))
                 .catch(() => setStatus('hfsStatus', false));
             
-            // Check Plex via Python API Server Status Endpoint
-            const PLEX_STATUS_API = PLEX_CHECK_API.replace('/check', '/status');
-            fetch(PLEX_STATUS_API)
+            const STATUS_API = PLEX_CHECK_API.replace('/check', '/status');
+            fetch(STATUS_API)
                 .then(res => res.json())
-                .then(data => {
-                    setStatus('plexStatus', data.online === true);
-                })
+                .then(data => setStatus('plexStatus', data.online === true))
                 .catch(() => setStatus('plexStatus', false));
         }
 
@@ -640,67 +505,45 @@
             }
         }
 
-        // TMDB Search UI Logic
         document.getElementById('movieSearch').addEventListener('input', async (e) => {
             const val = e.target.value; 
-            if (val.length < 3) { 
-                document.getElementById('results').classList.add('hidden'); 
-                return; 
-            }
+            if (val.length < 3) { document.getElementById('results').classList.add('hidden'); return; }
             try {
                 const res = await fetch(`https://api.themoviedb.org/3/search/multi?api_key=${TMDB_KEY}&query=${encodeURIComponent(val)}`);
                 const data = await res.json();
                 const results = document.getElementById('results'); 
-                
-                results.innerHTML = ''; 
-                results.classList.remove('hidden');
-                
+                results.innerHTML = ''; results.classList.remove('hidden');
                 data.results.slice(0, 5).forEach(item => {
                     const title = item.title || item.name; 
                     const year = (item.release_date || item.first_air_date || '').split('-')[0];
                     const div = document.createElement('div'); 
-                    
                     div.className = 'p-3 hover:bg-zinc-700/80 cursor-pointer border-b border-zinc-700/50 text-xs transition-colors flex justify-between items-center';
-                    
                     const yearDisplay = (year && item.media_type !== 'person') ? `(${year})` : '';
                     div.innerHTML = `<span><b>${title}</b> ${yearDisplay}</span> <span class="text-[9px] font-bold text-zinc-500 uppercase">${item.media_type}</span>`;
-                    
-                    div.onclick = () => {
-                        window.runVerification(title, year, "", item.media_type === 'tv' ? 'TV' : item.media_type === 'person' ? 'PERSON' : 'MOVIE', item.id);
-                    };
-                        
+                    div.onclick = () => window.runVerification(title, year, "", item.media_type === 'tv' ? 'TV' : item.media_type === 'person' ? 'PERSON' : 'MOVIE', item.id);
                     results.appendChild(div);
                 });
-            } catch (error) {
-                console.error("TMDB API Error:", error);
-            }
+            } catch (e) {}
         });
 
         async function startTvFlow(id, title, year) {
             selectedShow = { id, title, year };
             document.getElementById('searchContainer').classList.add('hidden');
             document.getElementById('drillDownContainer').classList.remove('hidden');
-            
             try {
                 const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}`);
                 const data = await res.json();
                 const box = document.getElementById('drillDownResults');
-                
                 document.getElementById('backToSeasonBtn').classList.add('hidden');
-                
                 box.innerHTML = `<div class="p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-emerald-500/20" onclick="window.runVerification('${title}', '${year}', '', 'TV')">Request Full Series</div>`;
-                
                 data.seasons.forEach(s => {
                     if(s.season_number === 0) return; 
-                    
                     const d = document.createElement('div'); 
                     d.className = 'p-3 hover:bg-zinc-700/80 border-b border-zinc-700/50 text-xs cursor-pointer transition-colors'; 
                     d.innerText = s.name;
-                    
                     d.onclick = () => {
                         document.getElementById('backToSeasonBtn').classList.remove('hidden');
                         box.innerHTML = `<div class="p-3 bg-blue-600/20 hover:bg-blue-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-blue-500/20" onclick="window.runVerification('${title}', '${year}', '[Season ${s.season_number}]', 'TV')">Request Entire Season ${s.season_number}</div>`;
-                        
                         for(let i=1; i<=s.episode_count; i++) {
                             const ep = document.createElement('div'); 
                             ep.className = 'p-2 hover:bg-zinc-700/80 border-b border-zinc-700/50 text-[10px] pl-6 cursor-pointer transition-colors'; 
@@ -711,68 +554,60 @@
                     };
                     box.appendChild(d);
                 });
-            } catch (error) {
-                console.error("Failed fetching TV details:", error);
+            } catch (e) {}
+        }
+
+        function toggleCustomRequest() {
+            const searchBox = document.getElementById('searchContainer');
+            const customBox = document.getElementById('customRequestContainer');
+            if (searchBox.classList.contains('hidden')) {
+                searchBox.classList.remove('hidden');
+                customBox.classList.add('hidden');
+            } else {
+                searchBox.classList.add('hidden');
+                customBox.classList.remove('hidden');
             }
         }
 
-        // PLEX CHECK API Communication
-        async function checkPlexAvailability(query, year, tag, type) {
-            try {
-                const response = await fetch(`${PLEX_CHECK_API}?query=${encodeURIComponent(query)}&year=${encodeURIComponent(year || '')}&tag=${encodeURIComponent(tag || '')}&type=${encodeURIComponent(type || '')}`);
-                const data = await response.json();
-                return data;
-            } catch (e) {
-                console.error("Plex check failed", e);
-                return { exists: false };
-            }
+        async function submitCustomItem() {
+            const val = document.getElementById('customItemInput').value.trim();
+            if (!val) return;
+            await window.runVerification(val, "", "", "CUSTOM");
+            document.getElementById('customItemInput').value = '';
         }
 
-        // Firebase Sync & Plex Check
         async function runVerification(title, year, tag, type, id=null) {
-            if (type === 'TV' && tag === "" && id) {
-                 startTvFlow(id, title, year);
-                 return;
-            }
-
+            if (type === 'TV' && tag === "" && id) { startTvFlow(id, title, year); return; }
             if (!currentUser) return; 
             const appId = "taran-portal"; 
-
             const msg = document.getElementById('statusMsg');
             msg.classList.remove('hidden');
             msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-zinc-800 text-blue-400";
-            msg.innerText = "🔍 Checking Plex...";
-
-            if (type !== 'PERSON') {
-                const plexStatus = await checkPlexAvailability(title, year, tag, type);
-                if (plexStatus && plexStatus.exists) {
-                    msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-500/50";
-                    msg.innerHTML = `✅ Found on Plex!<br><span class="text-[10px] opacity-80">Matching: ${plexStatus.title}</span>`;
-                    return; 
-                }
+            msg.innerText = "🔍 Processing Request...";
+            
+            // Bypass Plex check for PERSON and CUSTOM tags
+            if (type !== 'PERSON' && type !== 'CUSTOM') {
+                try {
+                    const res = await fetch(`${PLEX_CHECK_API}?query=${encodeURIComponent(title)}&year=${encodeURIComponent(year || '')}&tag=${encodeURIComponent(tag || '')}&type=${encodeURIComponent(type || '')}`);
+                    const plexStatus = await res.json();
+                    if (plexStatus && plexStatus.exists) {
+                        msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-500/50";
+                        msg.innerHTML = `✅ Found on Plex!<br><span class="text-[10px] opacity-80">Matching: ${plexStatus.title}</span>`;
+                        return; 
+                    }
+                } catch (e) {}
             }
             
-            let entry = title;
-            if (year && type !== 'PERSON') entry += ` (${year})`; 
-            if (tag) entry += ` ${tag}`;
-            entry += ` - ${type}`;
-            
+            let entry = `${title}${year && type !== 'PERSON' && type !== 'CUSTOM' ? ` (${year})` : ''}${tag ? ` ${tag}` : ''} - ${type}`;
             if(globalRequests.some(r => r.title === entry)) {
                 msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-yellow-900/40 text-yellow-400 border border-yellow-700/50";
                 msg.innerText = "⚠️ Already in Server Queue!";
             } else {
-                try {
-                    const newId = Date.now();
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', newId.toString());
-                    await setDoc(docRef, { title: entry, id: newId, dl_status: 'pending' });
-                    
-                    msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-700/50";
-                    msg.innerText = "🚀 Added to Server Queue!";
-                } catch(e) {
-                    console.error("Failed to add to database.", e);
-                    msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-red-900/40 text-red-400 border border-red-700/50";
-                    msg.innerText = "❌ Database Error!";
-                }
+                const newId = Date.now();
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', newId.toString());
+                await setDoc(docRef, { title: entry, id: newId, dl_status: 'pending' });
+                msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-700/50";
+                msg.innerText = "🚀 Added to Server Queue!";
             }
         }
 
@@ -781,127 +616,107 @@
             m.classList.toggle('hidden'); 
             m.classList.toggle('flex'); 
         }
-
-        function openListView() { 
-            toggleModal('listModal'); 
-        }
-
+        function openListView() { toggleModal('listModal'); }
+        
+        // CRITICAL BUG FIX: Ensure the flex class is properly removed so the modal doesn't lose its centering!
         function closeRequestModal() { 
-            document.getElementById('requestModal').classList.add('hidden');
-            document.getElementById('requestModal').classList.remove('flex');
+            const m = document.getElementById('requestModal');
+            m.classList.add('hidden'); 
+            m.classList.remove('flex'); 
             resetSearch(); 
         }
-
+        
         function resetSearch() { 
             document.getElementById('movieSearch').value = ''; 
             document.getElementById('searchContainer').classList.remove('hidden'); 
+            document.getElementById('customRequestContainer').classList.add('hidden');
+            document.getElementById('customItemInput').value = '';
             document.getElementById('drillDownContainer').classList.add('hidden'); 
             document.getElementById('results').classList.add('hidden'); 
             document.getElementById('statusMsg').classList.add('hidden'); 
-            selectedShow = null; 
         }
-
-        function backToSeasons() { 
-            if(selectedShow) startTvFlow(selectedShow.id, selectedShow.title, selectedShow.year); 
-        }
+        function backToSeasons() { if(selectedShow) startTvFlow(selectedShow.id, selectedShow.title, selectedShow.year); }
         
-        function toggleActorView() {
-            viewingActors = !viewingActors;
-            renderRequests();
+        function cycleViewMode() { 
+            if (currentViewMode === 'MEDIA') currentViewMode = 'ACTORS';
+            else if (currentViewMode === 'ACTORS') currentViewMode = 'CUSTOM';
+            else currentViewMode = 'MEDIA';
+            renderRequests(); 
         }
 
         function renderRequests() {
             const reqList = document.getElementById('publicRequestList');
             const dlList = document.getElementById('downloaderTaskList');
             const toggleBtn = document.getElementById('toggleActorBtn');
-            
             const data = globalRequests;
             
-            const filteredData = data.filter(req => 
-                viewingActors ? req.title.endsWith('- PERSON') : !req.title.endsWith('- PERSON')
-            );
+            let filteredData = [];
+            if (currentViewMode === 'MEDIA') {
+                filteredData = data.filter(req => !req.title.endsWith('- PERSON') && !req.title.endsWith('- CUSTOM'));
+                toggleBtn.innerText = "View Favorite Actors";
+            } else if (currentViewMode === 'ACTORS') {
+                filteredData = data.filter(req => req.title.endsWith('- PERSON'));
+                toggleBtn.innerText = "View Custom Requests (Books/Comics)";
+            } else {
+                filteredData = data.filter(req => req.title.endsWith('- CUSTOM'));
+                toggleBtn.innerText = "View Standard Media Queue";
+            }
             
-            toggleBtn.innerText = viewingActors ? "View Standard Media Queue" : "Favorite Actors to Watch";
-
             reqList.innerHTML = filteredData.length === 0 
-                ? `<li class="text-zinc-500 italic text-center text-xs py-10">${viewingActors ? 'No favorite actors added yet.' : 'Queue is empty.'}</li>` 
-                : filteredData.map(req => {
-                    const isDL = req.dl_status === 'downloading';
-                    return `
-                    <li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-700/50 text-[11px] shadow-sm">
-                        <span class="${isDL ? 'text-purple-400' : ''}">${req.title} ${isDL ? '(⬇️)' : ''}</span>
-                        <button onclick="removeReq(${req.id})" class="text-red-500/80 hover:text-red-400 px-2 font-bold transition-colors">✕</button>
-                    </li>`}).join('');
+                ? `<li class="text-zinc-500 italic text-center text-xs py-10">${currentViewMode === 'ACTORS' ? 'No favorite actors added yet.' : currentViewMode === 'CUSTOM' ? 'No custom requests added yet.' : 'Queue is empty.'}</li>` 
+                : filteredData.map(req => `<li class="flex justify-between items-center bg-zinc-800/40 p-3 rounded-xl border border-zinc-700/50 text-[11px] shadow-sm">
+                    <span class="${req.dl_status === 'downloading' ? 'text-purple-400' : ''}">${req.title}</span>
+                    <button onclick="removeReq(${req.id})" class="text-red-500/80 hover:text-red-400 px-2 font-bold transition-colors">✕</button>
+                  </li>`).join('');
             
-            const mediaOnlyData = data.filter(req => !req.title.endsWith('- PERSON'));
-            
-            dlList.innerHTML = mediaOnlyData.length === 0
-                ? `<li class="text-zinc-500 italic text-center text-xs py-10">No pending media requests.</li>`
-                : mediaOnlyData.map(req => {
-                    const isDL = req.dl_status === 'downloading';
-                    return `
-                    <li class="flex justify-between items-center ${isDL ? 'bg-purple-900/20 border-purple-700/50' : 'bg-zinc-800/40 border-zinc-700/50'} p-3 rounded-xl border text-[11px] shadow-sm transition-all">
-                        <span class="${isDL ? 'text-purple-300 line-through opacity-70' : ''}">${req.title}</span>
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox" class="hidden" ${isDL ? 'checked' : ''} onchange="toggleDownloadState(${req.id})">
-                            <div class="w-5 h-5 rounded border ${isDL ? 'bg-purple-600 border-purple-500' : 'bg-zinc-900 border-zinc-600'} flex items-center justify-center transition-colors">
-                                ${isDL ? '✓' : ''}
-                            </div>
-                        </label>
-                    </li>`}).join('');
+            // Downloader lists both MEDIA and CUSTOM so you can check off downloaded books/comics
+            const dlData = data.filter(req => !req.title.endsWith('- PERSON'));
+            dlList.innerHTML = dlData.length === 0
+                ? `<li class="text-zinc-500 italic text-center text-xs py-10">No pending downloads.</li>`
+                : dlData.map(req => {
+                const isDL = req.dl_status === 'downloading';
+                return `<li class="flex justify-between items-center ${isDL ? 'bg-purple-900/20 border-purple-700/50' : 'bg-zinc-800/40 border-zinc-700/50'} p-3 rounded-xl border text-[11px] shadow-sm transition-all">
+                    <span class="${isDL ? 'text-purple-300 line-through opacity-70' : ''}">${req.title}</span>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" class="hidden" ${isDL ? 'checked' : ''} onchange="toggleDownloadState(${req.id})">
+                        <div class="w-5 h-5 rounded border ${isDL ? 'bg-purple-600 border-purple-500' : 'bg-zinc-900 border-zinc-600'} flex items-center justify-center transition-colors">
+                            ${isDL ? '✓' : ''}
+                        </div>
+                    </label>
+                </li>`}).join('');
 
             if(adminMode) {
                 document.getElementById('adminListControls').classList.remove('hidden');
                 document.getElementById('adminControls').classList.remove('hidden');
-                const adminBtn = document.getElementById('adminBtn');
-                adminBtn.innerText = "ADMIN ACTIVE";
-                adminBtn.classList.add('text-emerald-500', 'font-bold');
+                document.getElementById('adminBtn').innerText = "ADMIN ACTIVE";
+                document.getElementById('adminBtn').classList.add('text-emerald-500', 'font-bold');
             }
         }
 
         async function toggleDownloadState(id) {
-            if(!currentUser) return;
             const appId = "taran-portal"; 
             const req = globalRequests.find(r => r.id === id);
-            if (req) {
-                const newStatus = req.dl_status === 'downloading' ? 'pending' : 'downloading';
+            if (req && currentUser) {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', id.toString());
-                await updateDoc(docRef, { dl_status: newStatus });
+                await updateDoc(docRef, { dl_status: req.dl_status === 'downloading' ? 'pending' : 'downloading' });
             }
         }
 
         async function verifyAdmin() { 
             const pass = await showCustomDialog('prompt', 'Enter Admin Code:', 'Password...');
-            if (pass === null) return; 
-
-            if (pass === ADMIN_PASS) { 
-                adminMode = true; 
-                renderRequests(); 
-            } else { 
-                await showCustomDialog('alert', 'Incorrect security code provided.'); 
-            }
+            if (pass === ADMIN_PASS) { adminMode = true; renderRequests(); }
+            else if (pass !== null) await showCustomDialog('alert', 'Incorrect security code.');
         }
         
         async function removeReq(id) { 
-            if(!currentUser) return;
             const appId = "taran-portal"; 
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', id.toString());
-                await deleteDoc(docRef);
-            } catch(e) {
-                console.error("Delete failed.", e);
-            }
+            if(currentUser) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', id.toString()));
         }
 
         async function clearAllRequests() { 
-            if(!currentUser) return;
             const appId = "taran-portal"; 
-            const confirmed = await showCustomDialog('confirm', 'Are you sure you want to clear the entire request queue?');
-            if(confirmed) { 
-                for (const req of globalRequests) {
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', req.id.toString());
-                    await deleteDoc(docRef);
-                }
+            if(currentUser && await showCustomDialog('confirm', 'Clear all requests?')) { 
+                for (const req of globalRequests) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', req.id.toString()));
             } 
         }
     </script>
