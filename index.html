@@ -9,8 +9,8 @@
     <!-- iOS and Android specific tags for PWA-like appearance -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="http://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
-    <link rel="icon" type="image/jpeg" href="http://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg">
+    <link rel="apple-touch-icon" href=""> <!-- Background -->
+    <link rel="icon" type="image/jpeg" href="http://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg"> <!-- Background -->
 
     <!-- Tailwind CSS for rapid styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -89,7 +89,7 @@
         const PLEX_URL = 'https://app.plex.tv/desktop';                     // Points to secure Plex Web App
         
         // HTTP Files URL (Bypasses Cloudflare HTTPS Proxy to avoid large-file TOS violations)
-        const HFS_URL = 'http://transfer.tarankurtz.com:8443';             
+        const HFS_URL = 'https://transfer.tarankurtz.com';                  
         
         const NAS_SETTINGS_URL = 'https://nas.tarankurtz.com';              // Tunnel, no port
         const DOWNLOAD_URL = 'https://download.tarankurtz.com';             // Tunnel, no port
@@ -235,7 +235,7 @@
         <div class="w-full max-w-sm bg-zinc-900/95 border border-orange-700/50 p-8 rounded-3xl relative shadow-2xl backdrop-blur-md">
             <button onclick="toggleModal('emailModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
             <h2 class="text-xl font-semibold mb-2 text-center text-orange-400 uppercase tracking-widest drop-shadow-md">Plex Access</h2>
-            <p class="text-[10px] text-zinc-400 text-center mb-6">Enter your PLEX email to request an invite.</p>
+            <p class="text-[10px] text-zinc-400 text-center mb-6">Enter your email to request an invite.</p>
             
             <form id="plexEmailForm" action="https://formspree.io/f/meevzjao" method="POST" onsubmit="handleEmailSubmit(event, 'emailStatusMsg', 'emailModal')" class="flex flex-col gap-4">
                 <input type="hidden" name="subject" value="New Plex Access Request">
@@ -401,7 +401,7 @@
             }
             const bgNum = localStorage.getItem('portalBg') || 1;
             // Use HTTP for background images to match the Files URL logic
-            const bgUrl = `http://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/Background%20-%20${bgNum}.jpg`;
+            const bgUrl = ``; //Background location
             document.getElementById('mainBody').style.backgroundImage = `url('${bgUrl}')`;
 
             checkOnlineStatus();
@@ -592,12 +592,18 @@
         }
 
         async function checkOnlineStatus() {
+            // Check HFS local
             fetch(HFS_URL, { mode: 'no-cors', cache: 'no-store' })
                 .then(() => setStatus('hfsStatus', true))
                 .catch(() => setStatus('hfsStatus', false));
             
-            fetch(NAS_SETTINGS_URL, { mode: 'no-cors', cache: 'no-store' })
-                .then(() => setStatus('plexStatus', true))
+            // Check Plex via Python API Server Status Endpoint
+            const PLEX_STATUS_API = PLEX_CHECK_API.replace('/check', '/status');
+            fetch(PLEX_STATUS_API)
+                .then(res => res.json())
+                .then(data => {
+                    setStatus('plexStatus', data.online === true);
+                })
                 .catch(() => setStatus('plexStatus', false));
         }
 
@@ -685,7 +691,6 @@
                             const ep = document.createElement('div'); 
                             ep.className = 'p-2 hover:bg-zinc-700/80 border-b border-zinc-700/50 text-[10px] pl-6 cursor-pointer transition-colors'; 
                             ep.innerText = `Episode ${i}`;
-                            // Provide year and tag to runVerification to ensure exact Plex match logic works!
                             ep.onclick = () => window.runVerification(title, year, `[S${s.season_number}E${i.toString().padStart(2,'0')}]`, "TV");
                             box.appendChild(ep);
                         }
@@ -698,7 +703,6 @@
         }
 
         // PLEX CHECK API Communication
-        // Now accurately passes the YEAR, TAG and TYPE to the Python Script
         async function checkPlexAvailability(query, year, tag, type) {
             try {
                 const response = await fetch(`${PLEX_CHECK_API}?query=${encodeURIComponent(query)}&year=${encodeURIComponent(year || '')}&tag=${encodeURIComponent(tag || '')}&type=${encodeURIComponent(type || '')}`);
@@ -725,12 +729,10 @@
             msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-zinc-800 text-blue-400";
             msg.innerText = "🔍 Checking Plex...";
 
-            // Check Plex strictly by passing Title, Year, Tag and Type
             if (type !== 'PERSON') {
                 const plexStatus = await checkPlexAvailability(title, year, tag, type);
                 if (plexStatus && plexStatus.exists) {
                     msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-500/50";
-                    // Using the cleaned up title format from Python to remove "undefined"
                     msg.innerHTML = `✅ Found on Plex!<br><span class="text-[10px] opacity-80">Matching: ${plexStatus.title}</span>`;
                     return; 
                 }
