@@ -9,8 +9,9 @@
     <!-- iOS and Android specific tags for PWA-like appearance -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="assets/images/ICON.jpg"> 
-    <link rel="icon" type="image/jpeg" href="assets/images/ICON.jpg">
+    <!-- UPDATED: Now properly mapped to look for the .png version of your icon -->
+    <link rel="apple-touch-icon" href="assets/images/ICON.png"> 
+    <link rel="icon" type="image/png" href="assets/images/ICON.png">
 
     <!-- Tailwind CSS for rapid styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -92,15 +93,9 @@
         
         // Background Image List (Exact filenames in assets/images/)
         const BACKGROUND_IMAGES = [
-            //"Background - Space.jpg",
-            //"Background - City.jpg",
-            //"Background - Nature.jpg",
-            //"Background - Abstract.jpg",
-            //"Background - Ocean.jpg",
             "Background - 3Dragon Ball - Goku God Unleashed.jpg",
             "Background - Dragon Ball - Goku Black.jpg",
             "Background - Dragon Ball - Goku and Chichi in sunset.jpg"
-
         ];
         
         const ADMIN_PASS = 'Potatoes2!'; 
@@ -539,7 +534,14 @@
                 const data = await res.json();
                 const box = document.getElementById('drillDownResults');
                 document.getElementById('backToSeasonBtn').classList.add('hidden');
-                box.innerHTML = `<div class="p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-emerald-500/20" onclick="window.runVerification('${title}', '${year}', '', 'TV')">Request Full Series</div>`;
+                
+                box.innerHTML = '';
+                const fullSeriesBtn = document.createElement('div');
+                fullSeriesBtn.className = "p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-emerald-500/20";
+                fullSeriesBtn.innerText = "Request Full Series";
+                fullSeriesBtn.onclick = () => window.runVerification(title, year, '', 'TV');
+                box.appendChild(fullSeriesBtn);
+
                 data.seasons.forEach(s => {
                     if(s.season_number === 0) return; 
                     const d = document.createElement('div'); 
@@ -547,7 +549,14 @@
                     d.innerText = s.name;
                     d.onclick = () => {
                         document.getElementById('backToSeasonBtn').classList.remove('hidden');
-                        box.innerHTML = `<div class="p-3 bg-blue-600/20 hover:bg-blue-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-blue-500/20" onclick="window.runVerification('${title}', '${year}', '[Season ${s.season_number}]', 'TV')">Request Entire Season ${s.season_number}</div>`;
+                        box.innerHTML = '';
+                        
+                        const entireSeasonBtn = document.createElement('div');
+                        entireSeasonBtn.className = "p-3 bg-blue-600/20 hover:bg-blue-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg transition-colors border border-blue-500/20";
+                        entireSeasonBtn.innerText = `Request Entire Season ${s.season_number}`;
+                        entireSeasonBtn.onclick = () => window.runVerification(title, year, `[Season ${s.season_number}]`, 'TV');
+                        box.appendChild(entireSeasonBtn);
+
                         for(let i=1; i<=s.episode_count; i++) {
                             const ep = document.createElement('div'); 
                             ep.className = 'p-2 hover:bg-zinc-700/80 border-b border-zinc-700/50 text-[10px] pl-6 cursor-pointer transition-colors'; 
@@ -582,10 +591,19 @@
 
         async function runVerification(title, year, tag, type, id=null) {
             if (type === 'TV' && tag === "" && id) { startTvFlow(id, title, year); return; }
-            if (!currentUser) return; 
-            const appId = "taran-portal"; 
+            
             const msg = document.getElementById('statusMsg');
             msg.classList.remove('hidden');
+
+            // Bug Fix: Catch mobile sleeping tab disconnections gracefully instead of silent failures
+            if (!currentUser) {
+                msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-yellow-900/40 text-yellow-400 border border-yellow-700/50";
+                msg.innerText = "⏳ Reconnecting to server... Please try tapping again.";
+                try { await signInAnonymously(auth); } catch (e) {}
+                return; 
+            }
+
+            const appId = "taran-portal"; 
             msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-zinc-800 text-blue-400";
             msg.innerText = "🔍 Processing Request...";
             
@@ -622,7 +640,6 @@
         }
         function openListView() { toggleModal('listModal'); }
         
-        // CRITICAL BUG FIX: Ensure the flex class is properly removed so the modal doesn't lose its centering!
         function closeRequestModal() { 
             const m = document.getElementById('requestModal');
             m.classList.add('hidden'); 
