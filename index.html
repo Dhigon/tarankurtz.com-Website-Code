@@ -102,8 +102,18 @@
         const ROUTER_URL = 'http://192.168.1.254';
         const CLOUDFLARE_URL = 'https://dash.cloudflare.com/03c14d743f0edb4784c1a97f7214f300/home/overview';
         
-        // Background Image Config
-        const MAX_BACKGROUNDS = 5; 
+        // Background Image Array (UPDATE these exact filenames to match what you upload to GitHub!)
+        const BACKGROUND_IMAGES = [
+            //"Background - Space.jpg",
+            //"Background - City.jpg",
+            //"Background - Nature.jpg",
+            //"Background - Abstract.jpg",
+            //"Background - Ocean.jpg",
+            "Background - Dragon Ball - Goku and Chichi in sunset.jpg",
+            "Background - Dragon Ball - Goku Black.jpg",
+            "Background - 3Dragon Ball - Goku God Unleashed.jpg",
+
+        ];
         
         // Admin & Backend Services
         const ADMIN_PASS = 'Potatoes2!'; 
@@ -395,13 +405,17 @@
 
             const lastBgUpdate = parseInt(localStorage.getItem('portal_last_bg_update') || 0);
             if (now - lastBgUpdate > 30 * 60 * 1000 || !localStorage.getItem('portalBg')) {
-                const randomBgNum = Math.floor(Math.random() * MAX_BACKGROUNDS) + 1;
-                localStorage.setItem('portalBg', randomBgNum);
+                // Select a random index from our new array
+                const randomBgIndex = Math.floor(Math.random() * BACKGROUND_IMAGES.length);
+                localStorage.setItem('portalBg', randomBgIndex);
                 localStorage.setItem('portal_last_bg_update', now);
             }
-            const bgNum = localStorage.getItem('portalBg') || 1;
+            const bgIndex = localStorage.getItem('portalBg') || 0;
+            // Fallback to index 0 just in case the array size changes
+            const bgFileName = BACKGROUND_IMAGES[bgIndex] || BACKGROUND_IMAGES[0];
+            
             // Points to GitHub Repo assets/images folder now for reliable access
-            const bgUrl = `assets/images/Background - ${bgNum}.jpg`; 
+            const bgUrl = `assets/images/${bgFileName}`; 
             document.getElementById('mainBody').style.backgroundImage = `url('${bgUrl}')`;
 
             checkOnlineStatus();
