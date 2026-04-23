@@ -9,8 +9,8 @@
     <!-- iOS and Android specific tags for PWA-like appearance -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href=""> <!-- Background -->
-    <link rel="icon" type="image/jpeg" href="http://transfer.tarankurtz.com:8443/KurtzHome610/assets%20(website)/images/ICON.jpg"> <!-- Background -->
+    <link rel="apple-touch-icon" href="assets/images/ICON.jpg"> <!-- Points to local GitHub repo folder -->
+    <link rel="icon" type="image/jpeg" href="assets/images/ICON.jpg"> <!-- Points to local GitHub repo folder -->
 
     <!-- Tailwind CSS for rapid styling -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -88,7 +88,7 @@
         // Software Network URLs
         const PLEX_URL = 'https://app.plex.tv/desktop';                     // Points to secure Plex Web App
         
-        // HTTP Files URL (Bypasses Cloudflare HTTPS Proxy to avoid large-file TOS violations)
+        // HTTP Files URL (Routed securely via Nginx Proxy Manager)
         const HFS_URL = 'https://transfer.tarankurtz.com';                  
         
         const NAS_SETTINGS_URL = 'https://nas.tarankurtz.com';              // Tunnel, no port
@@ -146,7 +146,7 @@
                 <div id="hfsStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-400 italic">Checking...</div>
                 <div class="text-3xl mb-1 drop-shadow-md">📂</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Files</div>
-                <span onclick="event.stopPropagation(); toggleModal('uploadAccessModal');" onauxclick="event.stopPropagation();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-blue-400 z-50 transition-colors">Request Upload Access</span>
+                <span onclick="event.stopPropagation(); toggleModal('uploadAccessModal');" onauxclick="event.stopPropagation();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-blue-400 z-50 transition-colors">Request Full Access</span>
             </div>
 
             <!-- Plex Media Card -->
@@ -400,8 +400,8 @@
                 localStorage.setItem('portal_last_bg_update', now);
             }
             const bgNum = localStorage.getItem('portalBg') || 1;
-            // Use HTTP for background images to match the Files URL logic
-            const bgUrl = ``; //Background location
+            // Points to GitHub Repo assets/images folder now for reliable access
+            const bgUrl = `assets/images/Background - ${bgNum}.jpg`; 
             document.getElementById('mainBody').style.backgroundImage = `url('${bgUrl}')`;
 
             checkOnlineStatus();
