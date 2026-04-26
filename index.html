@@ -108,8 +108,10 @@
         
         const FORMSPREE_PLEX_ENDPOINT = 'https://formspree.io/f/meevzjao';
         const FORMSPREE_UPLOAD_ENDPOINT = 'https://formspree.io/f/mbdqakda';
-        const FORMSPREE_MEDIA_REQUEST_ENDPOINT = 'https://formspree.io/f/YOUR_NEW_FORM_ID'; 
         const FORMSPREE_TRACKER_ENDPOINT = 'https://formspree.io/f/meevzjao'; 
+        
+        // Added the specified endpoint back for media requests
+        const FORMSPREE_MEDIA_REQUEST_ENDPOINT = 'https://formspree.io/f/xjgjzqad'; 
     </script>
 
     <main class="flex-1 flex flex-col items-center justify-center w-full max-w-4xl py-10">
@@ -366,6 +368,30 @@
         let globalRequests = []; 
         const appId = "taran-portal";
 
+        // ADDED: Reintroduced Escape key to close modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const modalsToToggle = ['uploadAccessModal', 'emailModal', 'trackerModal', 'listModal', 'downloaderModal'];
+                modalsToToggle.forEach(id => {
+                    const m = document.getElementById(id);
+                    if (m && !m.classList.contains('hidden')) toggleModal(id);
+                });
+                
+                const reqModal = document.getElementById('requestModal');
+                if (reqModal && !reqModal.classList.contains('hidden')) closeRequestModal();
+                
+                const customDialog = document.getElementById('customDialogModal');
+                if (customDialog && !customDialog.classList.contains('hidden')) {
+                    const cancelBtn = document.getElementById('dialogCancelBtn');
+                    if (cancelBtn && !cancelBtn.classList.contains('hidden')) cancelBtn.click();
+                    else {
+                        const confirmBtn = document.getElementById('dialogConfirmBtn');
+                        if (confirmBtn) confirmBtn.click(); 
+                    }
+                }
+            }
+        });
+
         (function init() {
             const randomTitle = TITLE_HEADERS[Math.floor(Math.random() * TITLE_HEADERS.length)];
             document.getElementById('editableTitle').innerText = randomTitle;
@@ -412,7 +438,6 @@
 
         /**
          * Custom Dialog Handler for Prompt/Confirm/Alert
-         * Restored to fix the ReferenceError
          */
         function showCustomDialog(type, message, placeholder = '') {
             return new Promise((resolve) => {
@@ -480,11 +505,21 @@
         }
 
         async function sendMediaNotification(itemTitle) {
-            if (FORMSPREE_MEDIA_REQUEST_ENDPOINT.includes('YOUR_NEW_FORM_ID')) return;
+            if (!FORMSPREE_MEDIA_REQUEST_ENDPOINT || FORMSPREE_MEDIA_REQUEST_ENDPOINT.includes('YOUR_NEW_FORM_ID')) return;
+            
             const formData = new FormData();
             formData.append('subject', 'New Media Request: ' + itemTitle);
             formData.append('message', 'A new request was added to the standard queue: ' + itemTitle);
-            try { await fetch(FORMSPREE_MEDIA_REQUEST_ENDPOINT, { method: 'POST', body: formData, headers: { 'Accept': 'application/json' } }); } catch (e) {}
+            
+            try {
+                await fetch(FORMSPREE_MEDIA_REQUEST_ENDPOINT, { 
+                    method: 'POST', 
+                    body: formData, 
+                    headers: { 'Accept': 'application/json' } 
+                });
+            } catch (e) {
+                console.error("Email send failed:", e);
+            }
         }
 
         async function handleEmailSubmit(event, statusMsgId, modalId) {
@@ -571,7 +606,7 @@
                     const plexStatus = await res.json();
                     if (plexStatus && plexStatus.exists) {
                         msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-500/50";
-                        msg.innerHTML = `✅ Found on Plex!`;
+                        msg.innerHTML = `✅ Found on Plex!<br><span class="text-[10px] opacity-80">Matching: ${plexStatus.title}</span>`;
                         return; 
                     }
                 } catch (e) {}
@@ -586,7 +621,11 @@
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', newId.toString()), { title: entry, id: newId, dl_status: 'pending' });
                 msg.className = "mt-4 p-3 rounded-xl text-center text-sm block bg-emerald-900/40 text-emerald-400 border border-emerald-500/50";
                 msg.innerText = "🚀 Added to Server Queue!";
-                if (type === 'MOVIE' || type === 'TV') sendMediaNotification(entry);
+                
+                if (type === 'MOVIE' || type === 'TV') {
+                    sendMediaNotification(entry);
+                }
+
                 if (type !== 'PERSON') {
                     actionArea.classList.remove('hidden');
                     document.getElementById('trackImmediatelyBtn').onclick = () => openTracker(entry);
@@ -598,15 +637,20 @@
             selectedShow = { id, title, year };
             document.getElementById('searchContainer').classList.add('hidden');
             document.getElementById('drillDownContainer').classList.remove('hidden');
+            
+            document.getElementById('backToSeasonBtn').classList.add('hidden');
+            
             const res = await fetch(`https://api.themoviedb.org/3/tv/${id}?api_key=${TMDB_KEY}`);
             const data = await res.json();
             const box = document.getElementById('drillDownResults');
             box.innerHTML = '';
+            
             const fullBtn = document.createElement('div');
             fullBtn.className = "p-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg border border-emerald-500/20";
             fullBtn.innerText = "Request Full Series";
             fullBtn.onclick = () => runVerification(title, year, '', 'TV');
             box.appendChild(fullBtn);
+
             data.seasons.forEach(s => {
                 if(s.season_number === 0) return; 
                 const d = document.createElement('div'); 
@@ -614,6 +658,7 @@
                 d.innerText = s.name;
                 d.onclick = () => {
                     document.getElementById('backToSeasonBtn').classList.remove('hidden');
+                    
                     box.innerHTML = '';
                     const sBtn = document.createElement('div');
                     sBtn.className = "p-3 bg-blue-600/20 hover:bg-blue-600/30 text-center text-xs cursor-pointer mb-2 rounded-lg border border-blue-500/20";
@@ -676,21 +721,29 @@
                 toggleBtn.innerText = "View Media Queue";
             }
             
+            // ADDED: Attempting Download indicator in List Modal
             reqList.innerHTML = filtered.length === 0 ? `<li class="text-zinc-500 italic text-center text-xs py-10">Queue is empty.</li>` : 
                 filtered.map(req => `<li class="flex flex-col gap-2 bg-zinc-800/40 p-3 rounded-xl border border-zinc-700/50 shadow-sm">
                     <div class="flex justify-between items-center">
-                        <span class="${req.dl_status === 'downloading' ? 'text-purple-400' : 'text-[11px]'}">${req.title}</span>
+                        <span class="${req.dl_status === 'downloading' ? 'text-purple-400 text-[11px]' : 'text-[11px]'}">
+                            ${req.title} 
+                            ${req.dl_status === 'downloading' ? '<span class="text-[9px] font-bold italic ml-2 opacity-80">(Attempting Download...)</span>' : ''}
+                        </span>
                         <button onclick="removeReq('${req.firebaseId}')" class="text-red-500/80 hover:text-red-400 px-2 font-bold transition-colors">✕</button>
                     </div>
                     ${(currentViewMode === 'MEDIA' || currentViewMode === 'CUSTOM') ? `<button onclick="openTracker('${req.title.replace(/'/g, "\\'")}')" class="w-full py-1.5 bg-blue-600/10 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[9px] text-blue-400 uppercase tracking-widest transition-all">Track This Item</button>` : ''}
                   </li>`).join('');
             
+            // ADDED: Attempting Download indicator in Downloader Modal
             const dlData = data.filter(req => !req.title.endsWith('- PERSON'));
             dlList.innerHTML = dlData.map(req => {
                 const isDL = req.dl_status === 'downloading';
                 return `<li class="flex justify-between items-center ${isDL ? 'bg-purple-900/20 border-purple-700/50' : 'bg-zinc-800/40 border-zinc-700/50'} p-3 rounded-xl border text-[11px] shadow-sm transition-all">
-                    <span class="${isDL ? 'text-purple-300 opacity-70' : ''}">${req.title}</span>
-                    <label class="flex items-center cursor-pointer">
+                    <div class="flex flex-col flex-1 pr-4">
+                        <span class="${isDL ? 'text-purple-300 opacity-70' : ''}">${req.title}</span>
+                        ${isDL ? '<span class="text-[9px] text-purple-400 font-bold mt-1 tracking-wider">ATTEMPTING DOWNLOAD...</span>' : ''}
+                    </div>
+                    <label class="flex items-center cursor-pointer flex-shrink-0">
                         <input type="checkbox" class="hidden" ${isDL ? 'checked' : ''} onchange="toggleDownloadState('${req.firebaseId}', '${req.dl_status}')">
                         <div class="w-5 h-5 rounded border ${isDL ? 'bg-purple-600 border-purple-500' : 'bg-zinc-900 border-zinc-600'} flex items-center justify-center transition-colors">
                             ${isDL ? '✓' : ''}
