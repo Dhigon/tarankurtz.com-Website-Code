@@ -150,13 +150,27 @@
                 <span onclick="event.stopPropagation(); openListView();" class="absolute bottom-2 text-[9px] text-zinc-400 underline uppercase tracking-widest hover:text-white z-50 transition-colors">View List</span>
             </div>
 
-            <!-- 3. YouTube -->
+            <!-- 3. Group Scheduler App -->
+            <div onclick="openScheduler()" class="dashboard-card rounded-2xl hover:border-indigo-400">
+                <div class="text-3xl mb-1 drop-shadow-md">📅</div>
+                <div class="text-[11px] uppercase tracking-widest font-bold">Group Scheduler</div>
+                <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-widest z-50">Plan Dates</span>
+            </div>
+
+            <!-- 4. Group Polls App -->
+            <div onclick="openPolls()" class="dashboard-card rounded-2xl hover:border-cyan-400">
+                <div class="text-3xl mb-1 drop-shadow-md">📊</div>
+                <div class="text-[11px] uppercase tracking-widest font-bold">Polls</div>
+                <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-widest z-50">Vote & Decide</span>
+            </div>
+
+            <!-- 5. YouTube -->
             <div onclick="handleLink(event, 'https://youtube.com')" onauxclick="handleLink(event, 'https://youtube.com')" class="dashboard-card rounded-2xl hover:border-red-600">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="brand-icon drop-shadow-md" alt="YouTube">
                 <div class="text-[11px] uppercase tracking-widest font-bold">YouTube</div>
             </div>
 
-            <!-- 4. Files -->
+            <!-- 6. Files -->
             <div onclick="handleLink(event, HFS_URL)" onauxclick="handleLink(event, HFS_URL)" class="dashboard-card rounded-2xl hover:border-blue-500">
                 <div id="hfsStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-400 italic">Checking...</div>
                 <div class="text-3xl mb-1 drop-shadow-md">📂</div>
@@ -164,48 +178,41 @@
                 <span onclick="event.stopPropagation(); toggleModal('uploadAccessModal');" onauxclick="event.stopPropagation();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-blue-400 z-50 transition-colors">Request Full Access</span>
             </div>
 
-            <!-- 5. Download TV -->
+            <!-- 7. Download TV -->
             <div onclick="handleLink(event, RENAME_TV_URL)" onauxclick="handleLink(event, RENAME_TV_URL)" class="dashboard-card rounded-2xl hover:border-teal-500">
                 <div class="text-3xl mb-1 drop-shadow-md">📺</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>TV</div>
             </div>
 
-            <!-- 6. Download Movie -->
+            <!-- 8. Download Movie -->
             <div onclick="handleLink(event, RENAME_MOVIE_URL)" onauxclick="handleLink(event, RENAME_MOVIE_URL)" class="dashboard-card rounded-2xl hover:border-indigo-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🎞️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>Movie</div>
             </div>
 
-            <!-- 7. Download Progress -->
+            <!-- 9. Download Progress -->
             <div onclick="toggleModal('downloaderModal')" class="dashboard-card rounded-2xl hover:border-purple-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🧲</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>Progress</div>
             </div>
 
-            <!-- 8. Backup Search -->
+            <!-- 10. Backup Search -->
             <div onclick="handleLink(event, SEARCH_URL)" onauxclick="handleLink(event, SEARCH_URL)" class="dashboard-card rounded-2xl hover:border-pink-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🔍</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Backup Search</div>
                 <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-widest z-50">Downloads</span>
             </div>
 
-            <!-- 9. NAS Settings -->
+            <!-- 11. NAS Settings -->
             <div onclick="handleLink(event, NAS_SETTINGS_URL)" onauxclick="handleLink(event, NAS_SETTINGS_URL)" class="dashboard-card rounded-2xl hover:border-zinc-400">
                 <div class="text-3xl mb-1 drop-shadow-md">⚙️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-2">NAS Settings</div>
             </div>
 
-            <!-- 10. Remote -->
+            <!-- 12. Remote -->
             <div onclick="handleLink(event, 'https://remotedesktop.google.com/access')" onauxclick="handleLink(event, 'https://remotedesktop.google.com/access')" class="dashboard-card rounded-2xl hover:border-blue-400">
                 <div class="text-3xl mb-1 drop-shadow-md">🖥️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Remote</div>
-            </div>
-            
-            <!-- 11. Scheduler App -->
-            <div onclick="openScheduler()" class="dashboard-card rounded-2xl hover:border-indigo-400">
-                <div class="text-3xl mb-1 drop-shadow-md">📅</div>
-                <div class="text-[11px] uppercase tracking-widest font-bold">Scheduler</div>
-                <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-widest z-50">Plan Dates</span>
             </div>
 
         </div>
@@ -293,32 +300,27 @@
         </div>
     </div>
 
-    <!-- NEW SCHEDULER MODAL (MULTI-SELECT & SUBSECTIONS ENABLED) -->
+    <!-- SCHEDULER MODAL -->
     <div id="schedulerModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
         <div class="w-full max-w-md bg-zinc-900/95 border border-indigo-700/50 p-6 rounded-3xl relative flex flex-col shadow-2xl backdrop-blur-md" style="height: 640px; max-height: 95vh;">
             <button onclick="toggleModal('schedulerModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
             <h2 class="text-xl font-semibold mb-4 text-center text-indigo-400 uppercase tracking-widest drop-shadow-md">Group Scheduler</h2>
             
-            <!-- Calendar Header -->
             <div class="flex justify-between items-center bg-zinc-800/50 rounded-xl p-3 mb-2 shrink-0">
                 <button onclick="prevMonth()" class="text-zinc-400 hover:text-white px-3 py-1 bg-zinc-700/50 rounded-lg hover:bg-zinc-600 transition-colors">&lt;</button>
                 <span id="calendarMonthYear" class="text-sm font-bold tracking-widest uppercase text-white"></span>
                 <button onclick="nextMonth()" class="text-zinc-400 hover:text-white px-3 py-1 bg-zinc-700/50 rounded-lg hover:bg-zinc-600 transition-colors">&gt;</button>
             </div>
             
-            <!-- Multi-select Clear Tool -->
             <button onclick="clearSchedulerSelection()" class="text-[9px] text-zinc-500 hover:text-indigo-400 underline uppercase tracking-widest mb-3 text-center w-full transition-colors shrink-0">Clear Selection</button>
 
-            <!-- Calendar Grid -->
             <div id="calendarGrid" class="grid grid-cols-7 gap-1 flex-1 content-start overflow-y-auto pr-1"></div>
 
-            <!-- Details Panel for selected days -->
             <div id="schedulerDetailsPanel" class="hidden mt-4 border-t border-zinc-700/50 pt-4 flex flex-col gap-3 shrink-0">
                 <h3 id="selectedDateHeader" class="text-[11px] uppercase tracking-widest text-center text-indigo-300"></h3>
                 
                 <div id="availabilityList" class="flex flex-col gap-1 max-h-[90px] overflow-y-auto pr-2 custom-scrollbar"></div>
                 
-                <!-- Inputs Section -->
                 <div class="flex flex-col gap-2 mt-2">
                     <input type="text" id="schedulerName" placeholder="Your Name..." class="bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-indigo-500 text-xs w-full transition-colors">
                     <div class="flex gap-2">
@@ -332,13 +334,58 @@
                     </div>
                 </div>
                 
-                <!-- Action Buttons -->
                 <div class="grid grid-cols-4 gap-2">
                     <button onclick="setAvailability('green')" class="py-2 bg-emerald-900/30 hover:bg-emerald-900/60 border border-emerald-700/50 rounded-lg text-[10px] text-emerald-400 tracking-wider transition-colors shadow-sm">✅</button>
                     <button onclick="setAvailability('yellow')" class="py-2 bg-yellow-900/30 hover:bg-yellow-900/60 border border-yellow-700/50 rounded-lg text-[10px] text-yellow-400 tracking-wider transition-colors shadow-sm">🟨</button>
                     <button onclick="setAvailability('red')" class="py-2 bg-red-900/30 hover:bg-red-900/60 border border-red-700/50 rounded-lg text-[10px] text-red-400 tracking-wider transition-colors shadow-sm">❌</button>
                     <button onclick="setAvailability('clear')" class="py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-lg text-[9px] text-zinc-400 uppercase tracking-widest transition-colors shadow-sm">Clear Me</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POLLS MODAL -->
+    <div id="pollsModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
+        <div class="w-full max-w-md bg-zinc-900/95 border border-cyan-700/50 p-6 rounded-3xl relative flex flex-col shadow-2xl backdrop-blur-md" style="height: 640px; max-height: 95vh;">
+            <button onclick="toggleModal('pollsModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors z-10">✕</button>
+            <h2 class="text-xl font-semibold mb-4 text-center text-cyan-400 uppercase tracking-widest drop-shadow-md">Group Polls</h2>
+            
+            <div class="flex border-b border-zinc-700/50 mb-4 shrink-0">
+                <button id="tabActivePolls" onclick="switchPollView('active')" class="flex-1 py-2 text-xs font-bold text-cyan-400 border-b-2 border-cyan-400 uppercase tracking-widest transition-colors">Active</button>
+                <button id="tabCreatePoll" onclick="switchPollView('create')" class="flex-1 py-2 text-xs font-bold text-zinc-500 hover:text-zinc-300 uppercase tracking-widest transition-colors">Create</button>
+                <button id="tabResultsPoll" onclick="switchPollView('results')" class="flex-1 py-2 text-xs font-bold text-zinc-500 hover:text-zinc-300 uppercase tracking-widest transition-colors">Results</button>
+            </div>
+
+            <!-- Global Name Input for Polls -->
+            <input type="text" id="pollUserName" placeholder="Your Name (Required to vote/create)..." class="bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-cyan-500 text-xs w-full transition-colors mb-4 shrink-0">
+
+            <div class="flex-1 overflow-y-auto pr-1 custom-scrollbar relative">
+                
+                <div id="viewActivePolls" class="flex flex-col gap-4"></div>
+
+                <div id="viewCreatePoll" class="hidden flex flex-col gap-3">
+                    <input type="text" id="newPollQuestion" placeholder="What's the question?" class="bg-zinc-800 border border-zinc-700 rounded-lg py-3 px-3 text-white outline-none focus:border-cyan-500 text-sm">
+                    <div id="pollOptionsList" class="flex flex-col gap-2">
+                        <input type="text" placeholder="Option 1" class="poll-opt bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-cyan-500 text-xs">
+                        <input type="text" placeholder="Option 2" class="poll-opt bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-cyan-500 text-xs">
+                    </div>
+                    <button onclick="addPollOptionUI()" class="text-left text-[10px] text-cyan-500 hover:text-cyan-400 uppercase tracking-widest py-1">+ Add another option</button>
+                    
+                    <div class="mt-2">
+                        <label class="text-[10px] text-zinc-400 uppercase tracking-widest">Duration</label>
+                        <select id="newPollDuration" class="w-full mt-1 bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-cyan-500 text-xs cursor-pointer">
+                            <option value="1">1 Hour</option>
+                            <option value="12">12 Hours</option>
+                            <option value="24">24 Hours</option>
+                            <option value="48">48 Hours</option>
+                            <option value="168">7 Days</option>
+                        </select>
+                    </div>
+                    <button onclick="submitNewPoll()" class="mt-4 w-full py-3 bg-cyan-600/80 hover:bg-cyan-500 rounded-xl text-[11px] text-white uppercase tracking-widest font-bold transition-all">Launch Poll</button>
+                </div>
+
+                <div id="viewResultsPoll" class="hidden flex flex-col gap-4"></div>
+
             </div>
         </div>
     </div>
@@ -440,7 +487,15 @@
         window.selectDate = selectDate;
         window.setAvailability = setAvailability;
         window.clearSchedulerSelection = clearSchedulerSelection;
-        window.removeSchedulerEntry = removeSchedulerEntry; // Explicitly export the single-entry delete tool
+        window.removeSchedulerEntry = removeSchedulerEntry; 
+
+        // Polls Specific Exports
+        window.openPolls = openPolls;
+        window.switchPollView = switchPollView;
+        window.addPollOptionUI = addPollOptionUI;
+        window.submitNewPoll = submitNewPoll;
+        window.castVote = castVote;
+        window.deletePoll = deletePoll;
 
         let adminMode = false; 
         let selectedShow = null;
@@ -449,15 +504,18 @@
         let globalRequests = []; 
         const appId = "taran-portal";
 
-        // Scheduler State
+        // State variables
         let currentCalendarDate = new Date();
-        let selectedDates = []; // NOW AN ARRAY for multi-select
+        let selectedDates = []; 
         let schedulerData = {};
+        
+        let pollsData = [];
+        let currentPollView = 'active';
 
-        // Escape key to close modals
+        // Escape key to close all modals safely
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                const modalsToToggle = ['uploadAccessModal', 'emailModal', 'trackerModal', 'listModal', 'downloaderModal', 'schedulerModal'];
+                const modalsToToggle = ['uploadAccessModal', 'emailModal', 'trackerModal', 'listModal', 'downloaderModal', 'schedulerModal', 'pollsModal'];
                 modalsToToggle.forEach(id => {
                     const m = document.getElementById(id);
                     if (m && !m.classList.contains('hidden')) toggleModal(id);
@@ -505,7 +563,7 @@
             onAuthStateChanged(auth, (user) => {
                 currentUser = user;
                 if (user) {
-                    // Subscribe to Media Requests
+                    // Queue Sync
                     const reqRef = collection(db, 'artifacts', appId, 'public', 'data', 'mediaRequests');
                     onSnapshot(reqRef, (snapshot) => {
                         globalRequests = [];
@@ -520,7 +578,7 @@
                         runMaintenanceCheck();
                     });
 
-                    // Subscribe to Scheduler Data
+                    // Scheduler Sync
                     const schedRef = collection(db, 'artifacts', appId, 'public', 'data', 'scheduler');
                     onSnapshot(schedRef, (snapshot) => {
                         schedulerData = {};
@@ -533,22 +591,249 @@
                             renderSchedulerDetails();
                         }
                     });
+
+                    // Polls Sync
+                    const pollsRef = collection(db, 'artifacts', appId, 'public', 'data', 'polls');
+                    onSnapshot(pollsRef, (snapshot) => {
+                        pollsData = [];
+                        snapshot.forEach(doc => {
+                            let data = doc.data();
+                            data.id = doc.id;
+                            pollsData.push(data);
+                        });
+                        const pModal = document.getElementById('pollsModal');
+                        if (pModal && !pModal.classList.contains('hidden')) renderPolls();
+                    });
                 }
             });
         } catch (e) {}
 
+        /**
+         * Custom Dialog Handler for Prompt/Confirm/Alert
+         */
+        function showCustomDialog(type, message, placeholder = '') {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('customDialogModal');
+                const msgEl = document.getElementById('dialogMessage');
+                const inputEl = document.getElementById('dialogInput');
+                const confirmBtn = document.getElementById('dialogConfirmBtn');
+                const cancelBtn = document.getElementById('dialogCancelBtn');
+
+                msgEl.innerText = message;
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+
+                if (type === 'prompt') {
+                    inputEl.classList.remove('hidden');
+                    inputEl.value = '';
+                    inputEl.placeholder = placeholder;
+                    cancelBtn.classList.remove('hidden');
+                    inputEl.focus();
+                } else if (type === 'confirm') {
+                    inputEl.classList.add('hidden');
+                    cancelBtn.classList.remove('hidden');
+                } else {
+                    inputEl.classList.add('hidden');
+                    cancelBtn.classList.add('hidden');
+                }
+
+                const cleanup = (val) => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    confirmBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                    inputEl.onkeydown = null;
+                    resolve(val);
+                };
+
+                confirmBtn.onclick = () => cleanup(type === 'prompt' ? inputEl.value : true);
+                cancelBtn.onclick = () => cleanup(type === 'prompt' ? null : false);
+                inputEl.onkeydown = (e) => { if (e.key === 'Enter') confirmBtn.click(); };
+            });
+        }
+
         // -----------------------------------------------------
-        // SCHEDULER LOGIC (MULTI-SELECT & DETAILED PAYLOADS)
+        // GROUP POLLS LOGIC
+        // -----------------------------------------------------
+        function openPolls() {
+            toggleModal('pollsModal');
+            // Share name logic with scheduler
+            const storedName = localStorage.getItem('schedulerName') || '';
+            document.getElementById('pollUserName').value = storedName;
+            switchPollView('active');
+        }
+
+        function switchPollView(view) {
+            currentPollView = view;
+            
+            // Tab styling
+            const actCls = "flex-1 py-2 text-xs font-bold text-cyan-400 border-b-2 border-cyan-400 uppercase tracking-widest transition-colors";
+            const inactCls = "flex-1 py-2 text-xs font-bold text-zinc-500 hover:text-zinc-300 uppercase tracking-widest transition-colors";
+            
+            document.getElementById('tabActivePolls').className = view === 'active' ? actCls : inactCls;
+            document.getElementById('tabCreatePoll').className = view === 'create' ? actCls : inactCls;
+            document.getElementById('tabResultsPoll').className = view === 'results' ? actCls : inactCls;
+            
+            // View toggling
+            document.getElementById('viewActivePolls').classList.toggle('hidden', view !== 'active');
+            document.getElementById('viewCreatePoll').classList.toggle('hidden', view !== 'create');
+            document.getElementById('viewResultsPoll').classList.toggle('hidden', view !== 'results');
+            
+            if (view === 'active' || view === 'results') renderPolls();
+        }
+
+        function addPollOptionUI() {
+            const container = document.getElementById('pollOptionsList');
+            const num = container.children.length + 1;
+            const el = document.createElement('input');
+            el.type = "text";
+            el.placeholder = "Option " + num;
+            el.className = "poll-opt bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-cyan-500 text-xs";
+            container.appendChild(el);
+        }
+
+        async function submitNewPoll() {
+            if (!currentUser) return;
+            const q = document.getElementById('newPollQuestion').value.trim();
+            const inputs = document.querySelectorAll('.poll-opt');
+            const nameEl = document.getElementById('pollUserName');
+            const name = nameEl.value.trim();
+            
+            if (!name) {
+                nameEl.classList.add('border-red-500');
+                setTimeout(() => nameEl.classList.remove('border-red-500'), 1000);
+                return;
+            }
+            if (!q) {
+                const qEl = document.getElementById('newPollQuestion');
+                qEl.classList.add('border-red-500');
+                setTimeout(() => qEl.classList.remove('border-red-500'), 1000);
+                return;
+            }
+            
+            let options = [];
+            inputs.forEach(inp => { if(inp.value.trim()) options.push(inp.value.trim()); });
+            if (options.length < 2) return await showCustomDialog('alert', 'You need at least 2 options to create a poll.');
+            
+            localStorage.setItem('schedulerName', name);
+
+            const hours = parseInt(document.getElementById('newPollDuration').value);
+            const expiresAt = Date.now() + (hours * 60 * 60 * 1000);
+            const newId = Date.now().toString();
+
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'polls', newId), {
+                question: q,
+                options: options,
+                votes: {}, 
+                expiresAt: expiresAt,
+                createdBy: name,
+                createdAt: Date.now()
+            });
+
+            // Reset UI cleanly
+            document.getElementById('newPollQuestion').value = '';
+            document.getElementById('pollOptionsList').innerHTML = `
+                <input type="text" placeholder="Option 1" class="poll-opt bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-cyan-500 text-xs">
+                <input type="text" placeholder="Option 2" class="poll-opt bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-cyan-500 text-xs">`;
+            
+            switchPollView('active');
+        }
+
+        async function castVote(pollId, optionIndex) {
+            if (!currentUser) return;
+            const nameEl = document.getElementById('pollUserName');
+            const name = nameEl.value.trim();
+            if (!name) {
+                nameEl.classList.add('border-red-500', 'ring-1', 'ring-red-500');
+                setTimeout(() => nameEl.classList.remove('border-red-500', 'ring-1', 'ring-red-500'), 1000);
+                return;
+            }
+            localStorage.setItem('schedulerName', name);
+
+            const pollRef = doc(db, 'artifacts', appId, 'public', 'data', 'polls', pollId.toString());
+            await updateDoc(pollRef, { [`votes.${name}`]: optionIndex });
+        }
+        
+        async function deletePoll(pollId) {
+            if(!currentUser) return;
+            if(await showCustomDialog('confirm', 'Are you sure you want to delete this poll permanently?')) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'polls', pollId.toString()));
+            }
+        }
+
+        function renderPolls() {
+            const now = Date.now();
+            const activeView = document.getElementById('viewActivePolls');
+            const resultsView = document.getElementById('viewResultsPoll');
+            
+            const activePolls = pollsData.filter(p => p.expiresAt > now).sort((a,b) => b.createdAt - a.createdAt);
+            const expiredPolls = pollsData.filter(p => p.expiresAt <= now).sort((a,b) => b.expiresAt - a.expiresAt);
+
+            const myName = document.getElementById('pollUserName').value.trim();
+
+            const buildPollHtml = (poll, isActive) => {
+                const totalVotes = Object.keys(poll.votes || {}).length;
+                let timeText = isActive ? 
+                    `<span class="text-cyan-400 font-bold">Ends in ${Math.max(1, Math.round((poll.expiresAt - now) / 3600000))} hrs</span>` : 
+                    `Ended ${new Date(poll.expiresAt).toLocaleDateString()}`;
+
+                const myVoteIndex = poll.votes ? poll.votes[myName] : null;
+
+                let optsHtml = poll.options.map((opt, i) => {
+                    let votesForOpt = 0;
+                    Object.values(poll.votes || {}).forEach(v => { if(v === i) votesForOpt++; });
+                    const pct = totalVotes > 0 ? Math.round((votesForOpt / totalVotes) * 100) : 0;
+                    
+                    if (isActive) {
+                        const isSelected = myVoteIndex === i;
+                        const btnClass = isSelected ? "bg-cyan-600/50 border-cyan-400 text-white shadow-[0_0_8px_rgba(34,211,238,0.4)]" : "bg-zinc-800/50 border-zinc-700/50 hover:border-cyan-500/50 text-zinc-300";
+                        return `
+                        <button onclick="castVote('${poll.id}', ${i})" class="w-full text-left px-3 py-2 rounded-lg border text-xs transition-all relative overflow-hidden ${btnClass}">
+                            <div class="relative z-10 flex justify-between font-semibold"><span>${opt}</span> <span class="opacity-70">${votesForOpt}</span></div>
+                            <div class="absolute inset-y-0 left-0 bg-cyan-900/40 z-0 transition-all duration-500" style="width: ${pct}%"></div>
+                        </button>`;
+                    } else {
+                        // Results view
+                        return `
+                        <div class="w-full text-left px-3 py-2 rounded-lg border border-zinc-700/30 bg-zinc-800/30 text-xs relative overflow-hidden">
+                            <div class="relative z-10 flex justify-between text-zinc-300 font-semibold"><span>${opt}</span> <span>${votesForOpt} (${pct}%)</span></div>
+                            <div class="absolute inset-y-0 left-0 bg-zinc-600/40 z-0 transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>`;
+                    }
+                }).join('');
+
+                const adminDel = adminMode ? `<button onclick="deletePoll('${poll.id}')" class="text-red-500 hover:text-red-400 text-[9px] ml-auto uppercase tracking-widest font-bold">Delete</button>` : '';
+
+                return `
+                <div class="bg-zinc-900 border border-zinc-700/50 rounded-xl p-4 shadow-md relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-3 relative z-10">
+                        <div>
+                            <h3 class="font-bold text-white text-sm leading-tight pr-2">${poll.question}</h3>
+                            <p class="text-[9px] text-zinc-500 uppercase tracking-widest mt-1">By ${poll.createdBy} • ${timeText}</p>
+                        </div>
+                        ${adminDel}
+                    </div>
+                    <div class="flex flex-col gap-2 relative z-10">
+                        ${optsHtml}
+                    </div>
+                    <div class="mt-3 text-right text-[9px] text-zinc-500 font-bold uppercase tracking-widest relative z-10">${totalVotes} total votes</div>
+                </div>`;
+            };
+
+            if (currentPollView === 'active') {
+                activeView.innerHTML = activePolls.length === 0 ? `<div class="text-[10px] text-zinc-500 text-center italic py-6">No active polls. Create one!</div>` : activePolls.map(p => buildPollHtml(p, true)).join('');
+            } else if (currentPollView === 'results') {
+                resultsView.innerHTML = expiredPolls.length === 0 ? `<div class="text-[10px] text-zinc-500 text-center italic py-6">No past polls to show.</div>` : expiredPolls.map(p => buildPollHtml(p, false)).join('');
+            }
+        }
+
+        // -----------------------------------------------------
+        // SCHEDULER LOGIC
         // -----------------------------------------------------
         function openScheduler() {
             toggleModal('schedulerModal');
-            renderCalendar();
-            
-            const today = new Date();
-            if (currentCalendarDate.getMonth() === today.getMonth() && currentCalendarDate.getFullYear() === today.getFullYear()) {
-                const todayStr = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
-                if (selectedDates.length === 0) selectedDates = [todayStr];
-            }
+            // Do NOT auto select today's date anymore! Just clear and render.
+            selectedDates = [];
             renderCalendar();
             renderSchedulerDetails();
         }
@@ -609,7 +894,6 @@
                     
                     users.forEach(u => {
                         const entry = dayData[u];
-                        // Support for new object payload or old string fallback
                         const status = typeof entry === 'string' ? entry : entry.status;
                         if (status === 'red') hasRed = true;
                         if (status === 'yellow') hasYellow = true;
@@ -625,7 +909,6 @@
                     }
                 }
 
-                // If selected, override border to highlight
                 if (selectedDates.includes(dateStr)) {
                     borderClass = "border-indigo-500 ring-1 ring-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)] scale-105 z-10 relative";
                 }
@@ -634,7 +917,6 @@
             }
         }
 
-        // Toggles a date inside the multi-select array
         function selectDate(dateStr) {
             if (selectedDates.includes(dateStr)) {
                 selectedDates = selectedDates.filter(d => d !== dateStr);
@@ -645,7 +927,6 @@
             renderSchedulerDetails();
         }
 
-        // Renders either the specific day responses, or a multi-day placeholder
         function renderSchedulerDetails() {
             const panel = document.getElementById('schedulerDetailsPanel');
             if (selectedDates.length === 0) {
@@ -695,12 +976,13 @@
                 listEl.innerHTML = `<div class="text-[10px] text-indigo-400 text-center italic bg-indigo-900/20 p-3 rounded-lg border border-indigo-500/20 mt-1">Applying availability across multiple dates simultaneously.<br>Existing individual responses hidden.</div>`;
             }
             
-            // Restore saved user name
             const storedName = localStorage.getItem('schedulerName') || '';
             document.getElementById('schedulerName').value = storedName;
+            
+            // Sync with polls name input just in case
+            if(document.getElementById('pollUserName')) document.getElementById('pollUserName').value = storedName;
         }
 
-        // Direct delete tool from the specific user line item
         async function removeSchedulerEntry(dateStr, userName) {
             if (!currentUser) return;
             const [y, m, d] = dateStr.split('-');
@@ -714,7 +996,6 @@
             }
         }
 
-        // Submits status to all selected dates at once
         async function setAvailability(status) {
             if (selectedDates.length === 0 || !currentUser) return;
             const nameInput = document.getElementById('schedulerName');
@@ -730,7 +1011,6 @@
             
             localStorage.setItem('schedulerName', name);
 
-            // Group the updates efficiently by Document ID (YYYY-MM) to minimize Firebase writes
             const updatesByDoc = {};
             selectedDates.forEach(dateStr => {
                 const [y, m] = dateStr.split('-');
@@ -744,7 +1024,6 @@
                 }
             });
 
-            // Execute the batched updates
             for (const [docId, updates] of Object.entries(updatesByDoc)) {
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'scheduler', docId);
                 try {
@@ -752,7 +1031,6 @@
                     if (!docSnap.exists()) {
                         if (status === 'clear') continue;
                         
-                        // Reconstruct object for setDoc if doc doesn't exist
                         const newData = {};
                         for (const key of Object.keys(updates)) {
                             const [dStr, n] = key.split('.');
@@ -763,55 +1041,14 @@
                     } else {
                         await updateDoc(docRef, updates);
                     }
-                } catch(e) { console.error(e); }
+                } catch(e) {}
             }
             
-            // Clear inputs purely for aesthetics after submit
             document.getElementById('schedulerActivity').value = '';
             document.getElementById('schedulerTime').value = 'All Day';
         }
+        
         // -----------------------------------------------------
-
-        function showCustomDialog(type, message, placeholder = '') {
-            return new Promise((resolve) => {
-                const modal = document.getElementById('customDialogModal');
-                const msgEl = document.getElementById('dialogMessage');
-                const inputEl = document.getElementById('dialogInput');
-                const confirmBtn = document.getElementById('dialogConfirmBtn');
-                const cancelBtn = document.getElementById('dialogCancelBtn');
-
-                msgEl.innerText = message;
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-
-                if (type === 'prompt') {
-                    inputEl.classList.remove('hidden');
-                    inputEl.value = '';
-                    inputEl.placeholder = placeholder;
-                    cancelBtn.classList.remove('hidden');
-                    inputEl.focus();
-                } else if (type === 'confirm') {
-                    inputEl.classList.add('hidden');
-                    cancelBtn.classList.remove('hidden');
-                } else {
-                    inputEl.classList.add('hidden');
-                    cancelBtn.classList.add('hidden');
-                }
-
-                const cleanup = (val) => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    confirmBtn.onclick = null;
-                    cancelBtn.onclick = null;
-                    inputEl.onkeydown = null;
-                    resolve(val);
-                };
-
-                confirmBtn.onclick = () => cleanup(type === 'prompt' ? inputEl.value : true);
-                cancelBtn.onclick = () => cleanup(type === 'prompt' ? null : false);
-                inputEl.onkeydown = (e) => { if (e.key === 'Enter') confirmBtn.click(); };
-            });
-        }
 
         async function runMaintenanceCheck() {
             if (!currentUser) return;
@@ -1108,6 +1345,7 @@
                 const listControls = document.getElementById('adminListControls');
                 if (listControls) listControls.classList.remove('hidden');
                 renderRequests(); 
+                if(document.getElementById('pollsModal') && !document.getElementById('pollsModal').classList.contains('hidden')) renderPolls();
             } else { await showCustomDialog('alert', 'Incorrect security code provided.'); }
         }
         
