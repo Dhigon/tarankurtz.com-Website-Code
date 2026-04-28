@@ -50,7 +50,7 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
         }
         
-        /* FIX: Strict overrides to prevent Chrome/Safari from coloring the search bar white during focus or autofill */
+        /* Strict overrides to prevent Chrome/Safari from coloring the search bar white during focus or autofill */
         #mainSearch, #mainSearch:focus, #mainSearch:active, #mainSearch:-webkit-autofill, #mainSearch:-webkit-autofill:hover, #mainSearch:-webkit-autofill:focus { 
             outline: none !important; 
             box-shadow: none !important; 
@@ -96,6 +96,7 @@
         const CLOUDFLARE_URL = 'https://dash.cloudflare.com/03c14d743f0edb4784c1a97f7214f300/home/overview';
         const FORMSPREE_ADMIN_URL = 'https://formspree.io/forms';
         
+        // Background Image List (Exact filenames in assets/images/)
         const BACKGROUND_IMAGES = [
             "Background - 3Dragon Ball - Goku God Unleashed.jpg",
             "Background - Dragon Ball - Goku Black.jpg",
@@ -106,11 +107,10 @@
         const GITHUB_CODE_URL = 'https://github.com/Dhigon/personal-template-web/blob/main/index.html';
         const PLEX_CHECK_API = 'https://plexcheck.tarankurtz.com/check';
         
+        // Formspree Endpoints
         const FORMSPREE_PLEX_ENDPOINT = 'https://formspree.io/f/meevzjao';
         const FORMSPREE_UPLOAD_ENDPOINT = 'https://formspree.io/f/mbdqakda';
         const FORMSPREE_TRACKER_ENDPOINT = 'https://formspree.io/f/meevzjao'; 
-        
-        // Added the specified endpoint back for media requests
         const FORMSPREE_MEDIA_REQUEST_ENDPOINT = 'https://formspree.io/f/xjgjzqad'; 
     </script>
 
@@ -132,9 +132,10 @@
             </div>
         </div>
 
-        <!-- Dashboard Grid Cards -->
+        <!-- Dashboard Grid Cards: Strictly Reordered -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full mb-12">
             
+            <!-- 1. Plex -->
             <div onclick="handleLink(event, PLEX_URL)" onauxclick="handleLink(event, PLEX_URL)" class="dashboard-card rounded-2xl hover:border-orange-500">
                 <div id="plexStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-400 italic">Checking...</div>
                 <div class="text-3xl mb-1 drop-shadow-md">🎬</div>
@@ -142,17 +143,20 @@
                 <span onclick="event.stopPropagation(); toggleModal('emailModal');" onauxclick="event.stopPropagation();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-orange-400 z-50 transition-colors">Request Access</span>
             </div>
 
+            <!-- 2. Request Media -->
             <div onclick="toggleModal('requestModal')" class="dashboard-card rounded-2xl hover:border-emerald-500">
                 <div class="text-3xl mb-1 drop-shadow-md">📥</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Request Media</div>
                 <span onclick="event.stopPropagation(); openListView();" class="absolute bottom-2 text-[9px] text-zinc-400 underline uppercase tracking-widest hover:text-white z-50 transition-colors">View List</span>
             </div>
 
+            <!-- 3. YouTube -->
             <div onclick="handleLink(event, 'https://youtube.com')" onauxclick="handleLink(event, 'https://youtube.com')" class="dashboard-card rounded-2xl hover:border-red-600">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg" class="brand-icon drop-shadow-md" alt="YouTube">
                 <div class="text-[11px] uppercase tracking-widest font-bold">YouTube</div>
             </div>
 
+            <!-- 4. Files -->
             <div onclick="handleLink(event, HFS_URL)" onauxclick="handleLink(event, HFS_URL)" class="dashboard-card rounded-2xl hover:border-blue-500">
                 <div id="hfsStatus" class="absolute top-2 text-[8px] uppercase tracking-tighter text-zinc-400 italic">Checking...</div>
                 <div class="text-3xl mb-1 drop-shadow-md">📂</div>
@@ -160,35 +164,48 @@
                 <span onclick="event.stopPropagation(); toggleModal('uploadAccessModal');" onauxclick="event.stopPropagation();" class="absolute bottom-2 text-[8px] text-zinc-400 underline uppercase hover:text-blue-400 z-50 transition-colors">Request Full Access</span>
             </div>
 
+            <!-- 5. Download TV -->
             <div onclick="handleLink(event, RENAME_TV_URL)" onauxclick="handleLink(event, RENAME_TV_URL)" class="dashboard-card rounded-2xl hover:border-teal-500">
                 <div class="text-3xl mb-1 drop-shadow-md">📺</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>TV</div>
             </div>
 
+            <!-- 6. Download Movie -->
             <div onclick="handleLink(event, RENAME_MOVIE_URL)" onauxclick="handleLink(event, RENAME_MOVIE_URL)" class="dashboard-card rounded-2xl hover:border-indigo-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🎞️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>Movie</div>
             </div>
 
+            <!-- 7. Download Progress -->
             <div onclick="toggleModal('downloaderModal')" class="dashboard-card rounded-2xl hover:border-purple-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🧲</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-1">Download<br>Progress</div>
             </div>
 
+            <!-- 8. Backup Search -->
             <div onclick="handleLink(event, SEARCH_URL)" onauxclick="handleLink(event, SEARCH_URL)" class="dashboard-card rounded-2xl hover:border-pink-500">
                 <div class="text-3xl mb-1 drop-shadow-md">🔍</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Backup Search</div>
                 <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-widest z-50">Downloads</span>
             </div>
 
+            <!-- 9. NAS Settings -->
             <div onclick="handleLink(event, NAS_SETTINGS_URL)" onauxclick="handleLink(event, NAS_SETTINGS_URL)" class="dashboard-card rounded-2xl hover:border-zinc-400">
                 <div class="text-3xl mb-1 drop-shadow-md">⚙️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold text-center px-2">NAS Settings</div>
             </div>
 
+            <!-- 10. Remote -->
             <div onclick="handleLink(event, 'https://remotedesktop.google.com/access')" onauxclick="handleLink(event, 'https://remotedesktop.google.com/access')" class="dashboard-card rounded-2xl hover:border-blue-400">
                 <div class="text-3xl mb-1 drop-shadow-md">🖥️</div>
                 <div class="text-[11px] uppercase tracking-widest font-bold">Remote</div>
+            </div>
+            
+            <!-- 11. Scheduler App -->
+            <div onclick="openScheduler()" class="dashboard-card rounded-2xl hover:border-indigo-400">
+                <div class="text-3xl mb-1 drop-shadow-md">📅</div>
+                <div class="text-[11px] uppercase tracking-widest font-bold">Scheduler</div>
+                <span class="absolute bottom-2 text-[8px] text-zinc-400 uppercase tracking-widest z-50">Plan Dates</span>
             </div>
 
         </div>
@@ -240,6 +257,7 @@
         </div>
     </div>
 
+    <!-- MAIN REQUEST MEDIA MODAL -->
     <div id="requestModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
         <div class="w-full max-w-md bg-zinc-900/90 border border-zinc-700/50 p-8 rounded-3xl relative modal-fixed-height shadow-2xl backdrop-blur-md">
             <button onclick="closeRequestModal()" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
@@ -275,6 +293,57 @@
         </div>
     </div>
 
+    <!-- NEW SCHEDULER MODAL (MULTI-SELECT & SUBSECTIONS ENABLED) -->
+    <div id="schedulerModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
+        <div class="w-full max-w-md bg-zinc-900/95 border border-indigo-700/50 p-6 rounded-3xl relative flex flex-col shadow-2xl backdrop-blur-md" style="height: 640px; max-height: 95vh;">
+            <button onclick="toggleModal('schedulerModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
+            <h2 class="text-xl font-semibold mb-4 text-center text-indigo-400 uppercase tracking-widest drop-shadow-md">Group Scheduler</h2>
+            
+            <!-- Calendar Header -->
+            <div class="flex justify-between items-center bg-zinc-800/50 rounded-xl p-3 mb-2 shrink-0">
+                <button onclick="prevMonth()" class="text-zinc-400 hover:text-white px-3 py-1 bg-zinc-700/50 rounded-lg hover:bg-zinc-600 transition-colors">&lt;</button>
+                <span id="calendarMonthYear" class="text-sm font-bold tracking-widest uppercase text-white"></span>
+                <button onclick="nextMonth()" class="text-zinc-400 hover:text-white px-3 py-1 bg-zinc-700/50 rounded-lg hover:bg-zinc-600 transition-colors">&gt;</button>
+            </div>
+            
+            <!-- Multi-select Clear Tool -->
+            <button onclick="clearSchedulerSelection()" class="text-[9px] text-zinc-500 hover:text-indigo-400 underline uppercase tracking-widest mb-3 text-center w-full transition-colors shrink-0">Clear Selection</button>
+
+            <!-- Calendar Grid -->
+            <div id="calendarGrid" class="grid grid-cols-7 gap-1 flex-1 content-start overflow-y-auto pr-1"></div>
+
+            <!-- Details Panel for selected days -->
+            <div id="schedulerDetailsPanel" class="hidden mt-4 border-t border-zinc-700/50 pt-4 flex flex-col gap-3 shrink-0">
+                <h3 id="selectedDateHeader" class="text-[11px] uppercase tracking-widest text-center text-indigo-300"></h3>
+                
+                <div id="availabilityList" class="flex flex-col gap-1 max-h-[90px] overflow-y-auto pr-2 custom-scrollbar"></div>
+                
+                <!-- Inputs Section -->
+                <div class="flex flex-col gap-2 mt-2">
+                    <input type="text" id="schedulerName" placeholder="Your Name..." class="bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-indigo-500 text-xs w-full transition-colors">
+                    <div class="flex gap-2">
+                        <select id="schedulerTime" class="bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-2 text-white outline-none focus:border-indigo-500 text-xs w-1/3 transition-colors">
+                            <option value="All Day">All Day</option>
+                            <option value="Morning">Morning</option>
+                            <option value="Afternoon">Afternoon</option>
+                            <option value="Evening">Evening</option>
+                        </select>
+                        <input type="text" id="schedulerActivity" placeholder="Activity? (Optional)" class="bg-zinc-800 border border-zinc-700 rounded-lg py-2 px-3 text-white outline-none focus:border-indigo-500 text-xs w-2/3 transition-colors">
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="setAvailability('green')" class="py-2 bg-emerald-900/30 hover:bg-emerald-900/60 border border-emerald-700/50 rounded-lg text-[10px] text-emerald-400 tracking-wider transition-colors shadow-sm">✅</button>
+                    <button onclick="setAvailability('yellow')" class="py-2 bg-yellow-900/30 hover:bg-yellow-900/60 border border-yellow-700/50 rounded-lg text-[10px] text-yellow-400 tracking-wider transition-colors shadow-sm">🟨</button>
+                    <button onclick="setAvailability('red')" class="py-2 bg-red-900/30 hover:bg-red-900/60 border border-red-700/50 rounded-lg text-[10px] text-red-400 tracking-wider transition-colors shadow-sm">❌</button>
+                    <button onclick="setAvailability('clear')" class="py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-lg text-[9px] text-zinc-400 uppercase tracking-widest transition-colors shadow-sm">Clear Me</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Queue List Modal -->
     <div id="listModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
         <div class="w-full max-w-md bg-zinc-900/90 border border-zinc-700/50 p-8 rounded-3xl relative flex flex-col modal-fixed-height shadow-2xl backdrop-blur-md">
             <button onclick="toggleModal('listModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
@@ -291,6 +360,7 @@
         </div>
     </div>
 
+    <!-- Downloader Modal -->
     <div id="downloaderModal" class="fixed inset-0 bg-black/80 backdrop-blur-lg hidden items-center justify-center z-[100] p-4">
         <div class="w-full max-w-md bg-zinc-900/90 border border-purple-700/30 p-8 rounded-3xl relative flex flex-col modal-fixed-height shadow-2xl backdrop-blur-md">
             <button onclick="toggleModal('downloaderModal')" class="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors">✕</button>
@@ -303,6 +373,7 @@
         </div>
     </div>
 
+    <!-- Custom Dialog Modal -->
     <div id="customDialogModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-[200] p-4">
         <div class="bg-zinc-900/95 border border-zinc-700 p-6 rounded-2xl max-w-sm w-full text-center shadow-2xl backdrop-blur-xl">
             <p id="dialogMessage" class="mb-5 text-sm text-zinc-200 tracking-wide"></p>
@@ -339,7 +410,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Added deleteField and getDoc to support the Scheduler nested document merging
+        import { getFirestore, collection, doc, setDoc, deleteDoc, updateDoc, onSnapshot, getDoc, deleteField } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // EXPORT TO WINDOW FOR HTML ONCLICK EVENTS
         window.handleLink = handleLink;
@@ -360,6 +432,15 @@
         window.submitCustomItem = submitCustomItem;
         window.openTracker = openTracker;
         window.showCustomDialog = showCustomDialog;
+        
+        // Scheduler Specific Exports
+        window.openScheduler = openScheduler;
+        window.prevMonth = prevMonth;
+        window.nextMonth = nextMonth;
+        window.selectDate = selectDate;
+        window.setAvailability = setAvailability;
+        window.clearSchedulerSelection = clearSchedulerSelection;
+        window.removeSchedulerEntry = removeSchedulerEntry; // Explicitly export the single-entry delete tool
 
         let adminMode = false; 
         let selectedShow = null;
@@ -368,10 +449,15 @@
         let globalRequests = []; 
         const appId = "taran-portal";
 
-        // ADDED: Reintroduced Escape key to close modals
+        // Scheduler State
+        let currentCalendarDate = new Date();
+        let selectedDates = []; // NOW AN ARRAY for multi-select
+        let schedulerData = {};
+
+        // Escape key to close modals
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                const modalsToToggle = ['uploadAccessModal', 'emailModal', 'trackerModal', 'listModal', 'downloaderModal'];
+                const modalsToToggle = ['uploadAccessModal', 'emailModal', 'trackerModal', 'listModal', 'downloaderModal', 'schedulerModal'];
                 modalsToToggle.forEach(id => {
                     const m = document.getElementById(id);
                     if (m && !m.classList.contains('hidden')) toggleModal(id);
@@ -419,6 +505,7 @@
             onAuthStateChanged(auth, (user) => {
                 currentUser = user;
                 if (user) {
+                    // Subscribe to Media Requests
                     const reqRef = collection(db, 'artifacts', appId, 'public', 'data', 'mediaRequests');
                     onSnapshot(reqRef, (snapshot) => {
                         globalRequests = [];
@@ -432,13 +519,259 @@
                         renderRequests();
                         runMaintenanceCheck();
                     });
+
+                    // Subscribe to Scheduler Data
+                    const schedRef = collection(db, 'artifacts', appId, 'public', 'data', 'scheduler');
+                    onSnapshot(schedRef, (snapshot) => {
+                        schedulerData = {};
+                        snapshot.forEach(doc => {
+                            schedulerData[doc.id] = doc.data();
+                        });
+                        const schedModal = document.getElementById('schedulerModal');
+                        if (schedModal && !schedModal.classList.contains('hidden')) {
+                            renderCalendar();
+                            renderSchedulerDetails();
+                        }
+                    });
                 }
             });
         } catch (e) {}
 
-        /**
-         * Custom Dialog Handler for Prompt/Confirm/Alert
-         */
+        // -----------------------------------------------------
+        // SCHEDULER LOGIC (MULTI-SELECT & DETAILED PAYLOADS)
+        // -----------------------------------------------------
+        function openScheduler() {
+            toggleModal('schedulerModal');
+            renderCalendar();
+            
+            const today = new Date();
+            if (currentCalendarDate.getMonth() === today.getMonth() && currentCalendarDate.getFullYear() === today.getFullYear()) {
+                const todayStr = `${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+                if (selectedDates.length === 0) selectedDates = [todayStr];
+            }
+            renderCalendar();
+            renderSchedulerDetails();
+        }
+
+        function clearSchedulerSelection() {
+            selectedDates = [];
+            renderCalendar();
+            renderSchedulerDetails();
+        }
+
+        function prevMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            
+            document.getElementById('calendarMonthYear').innerText = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(d => {
+                grid.innerHTML += `<div class="text-center text-[9px] text-zinc-500 font-bold uppercase py-1">${d}</div>`;
+            });
+
+            for (let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div></div>`;
+            }
+
+            const docId = `${year}-${(month+1).toString().padStart(2, '0')}`;
+            const monthData = schedulerData[docId] || {};
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dateStr = `${year}-${(month+1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+                const dayData = monthData[dateStr] || {};
+                
+                let bgClass = "bg-zinc-800/40 hover:bg-zinc-700/60";
+                let borderClass = "border-zinc-700/50";
+                
+                const users = Object.keys(dayData);
+                if (users.length > 0) {
+                    let hasRed = false;
+                    let hasYellow = false;
+                    let hasGreen = false;
+                    
+                    users.forEach(u => {
+                        const entry = dayData[u];
+                        // Support for new object payload or old string fallback
+                        const status = typeof entry === 'string' ? entry : entry.status;
+                        if (status === 'red') hasRed = true;
+                        if (status === 'yellow') hasYellow = true;
+                        if (status === 'green') hasGreen = true;
+                    });
+                    
+                    if (hasRed) {
+                        bgClass = "bg-red-900/30"; borderClass = "border-red-500/50";
+                    } else if (hasYellow) {
+                        bgClass = "bg-yellow-900/30"; borderClass = "border-yellow-500/50";
+                    } else if (hasGreen) {
+                        bgClass = "bg-emerald-900/30"; borderClass = "border-emerald-500/50";
+                    }
+                }
+
+                // If selected, override border to highlight
+                if (selectedDates.includes(dateStr)) {
+                    borderClass = "border-indigo-500 ring-1 ring-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)] scale-105 z-10 relative";
+                }
+
+                grid.innerHTML += `<div onclick="selectDate('${dateStr}')" class="aspect-square flex items-center justify-center rounded-lg border cursor-pointer transition-all ${bgClass} ${borderClass} text-xs font-semibold">${i}</div>`;
+            }
+        }
+
+        // Toggles a date inside the multi-select array
+        function selectDate(dateStr) {
+            if (selectedDates.includes(dateStr)) {
+                selectedDates = selectedDates.filter(d => d !== dateStr);
+            } else {
+                selectedDates.push(dateStr);
+            }
+            renderCalendar(); 
+            renderSchedulerDetails();
+        }
+
+        // Renders either the specific day responses, or a multi-day placeholder
+        function renderSchedulerDetails() {
+            const panel = document.getElementById('schedulerDetailsPanel');
+            if (selectedDates.length === 0) {
+                panel.classList.add('hidden');
+                return;
+            }
+            panel.classList.remove('hidden');
+
+            const listEl = document.getElementById('availabilityList');
+            const headerEl = document.getElementById('selectedDateHeader');
+
+            if (selectedDates.length === 1) {
+                const dateStr = selectedDates[0];
+                const [y, m, d] = dateStr.split('-');
+                const docId = `${y}-${m}`;
+                const monthData = schedulerData[docId] || {};
+                const dayData = monthData[dateStr] || {};
+                
+                headerEl.innerText = `Availability for ${m}/${d}/${y}`;
+                
+                const users = Object.keys(dayData);
+                if (users.length === 0) {
+                    listEl.innerHTML = `<div class="text-[10px] text-zinc-500 text-center italic mt-2">No responses yet.</div>`;
+                } else {
+                    listEl.innerHTML = users.map(u => {
+                        const entry = dayData[u];
+                        const status = typeof entry === 'string' ? entry : entry.status;
+                        const time = entry.time && entry.time !== 'All Day' ? `<span class="text-[9px] text-zinc-400 font-normal ml-1">(${entry.time})</span>` : '';
+                        const act = entry.activity ? `<span class="text-[9px] text-zinc-500 block italic leading-tight mt-0.5">${entry.activity}</span>` : '';
+                        const icon = status === 'green' ? '✅' : status === 'yellow' ? '🟨' : '❌';
+                        
+                        return `
+                        <div class="flex justify-between items-center bg-zinc-800/40 px-3 py-2 rounded-lg relative group transition-colors hover:bg-zinc-800/80">
+                            <div class="flex flex-col flex-1 overflow-hidden">
+                                <span class="text-xs font-semibold text-white whitespace-nowrap truncate">${u}${time}</span>
+                                ${act}
+                            </div>
+                            <div class="flex items-center gap-2 pl-2">
+                                <span class="text-sm shadow-sm">${icon}</span>
+                                <button onclick="removeSchedulerEntry('${dateStr}', '${u}')" class="text-red-500/50 hover:text-red-400 text-xs px-1 font-bold transition-colors" title="Delete Entry">✕</button>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            } else {
+                headerEl.innerText = `Editing ${selectedDates.length} Selected Dates`;
+                listEl.innerHTML = `<div class="text-[10px] text-indigo-400 text-center italic bg-indigo-900/20 p-3 rounded-lg border border-indigo-500/20 mt-1">Applying availability across multiple dates simultaneously.<br>Existing individual responses hidden.</div>`;
+            }
+            
+            // Restore saved user name
+            const storedName = localStorage.getItem('schedulerName') || '';
+            document.getElementById('schedulerName').value = storedName;
+        }
+
+        // Direct delete tool from the specific user line item
+        async function removeSchedulerEntry(dateStr, userName) {
+            if (!currentUser) return;
+            const [y, m, d] = dateStr.split('-');
+            const docId = `${y}-${m}`;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'scheduler', docId);
+            
+            try {
+                await updateDoc(docRef, { [`${dateStr}.${userName}`]: deleteField() });
+            } catch (e) {
+                console.error("Failed to remove entry:", e);
+            }
+        }
+
+        // Submits status to all selected dates at once
+        async function setAvailability(status) {
+            if (selectedDates.length === 0 || !currentUser) return;
+            const nameInput = document.getElementById('schedulerName');
+            const name = nameInput.value.trim();
+            if (!name) {
+                nameInput.classList.add('border-red-500');
+                setTimeout(() => nameInput.classList.remove('border-red-500'), 1000);
+                return;
+            }
+            
+            const time = document.getElementById('schedulerTime').value;
+            const activity = document.getElementById('schedulerActivity').value.trim();
+            
+            localStorage.setItem('schedulerName', name);
+
+            // Group the updates efficiently by Document ID (YYYY-MM) to minimize Firebase writes
+            const updatesByDoc = {};
+            selectedDates.forEach(dateStr => {
+                const [y, m] = dateStr.split('-');
+                const docId = `${y}-${m}`;
+                if (!updatesByDoc[docId]) updatesByDoc[docId] = {};
+                
+                if (status === 'clear') {
+                    updatesByDoc[docId][`${dateStr}.${name}`] = deleteField();
+                } else {
+                    updatesByDoc[docId][`${dateStr}.${name}`] = { status, time, activity };
+                }
+            });
+
+            // Execute the batched updates
+            for (const [docId, updates] of Object.entries(updatesByDoc)) {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'scheduler', docId);
+                try {
+                    const docSnap = await getDoc(docRef);
+                    if (!docSnap.exists()) {
+                        if (status === 'clear') continue;
+                        
+                        // Reconstruct object for setDoc if doc doesn't exist
+                        const newData = {};
+                        for (const key of Object.keys(updates)) {
+                            const [dStr, n] = key.split('.');
+                            if (!newData[dStr]) newData[dStr] = {};
+                            newData[dStr][n] = updates[key];
+                        }
+                        await setDoc(docRef, newData);
+                    } else {
+                        await updateDoc(docRef, updates);
+                    }
+                } catch(e) { console.error(e); }
+            }
+            
+            // Clear inputs purely for aesthetics after submit
+            document.getElementById('schedulerActivity').value = '';
+            document.getElementById('schedulerTime').value = 'All Day';
+        }
+        // -----------------------------------------------------
+
         function showCustomDialog(type, message, placeholder = '') {
             return new Promise((resolve) => {
                 const modal = document.getElementById('customDialogModal');
@@ -498,6 +831,7 @@
                     const plexData = await res.json();
                     
                     if (plexData && plexData.exists) {
+                        console.log(`Auto-Maintenance: Purging ${item.title} (Found on Plex)`);
                         await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'mediaRequests', item.firebaseId));
                     }
                 } catch (err) {}
@@ -721,7 +1055,6 @@
                 toggleBtn.innerText = "View Media Queue";
             }
             
-            // ADDED: Attempting Download indicator in List Modal
             reqList.innerHTML = filtered.length === 0 ? `<li class="text-zinc-500 italic text-center text-xs py-10">Queue is empty.</li>` : 
                 filtered.map(req => `<li class="flex flex-col gap-2 bg-zinc-800/40 p-3 rounded-xl border border-zinc-700/50 shadow-sm">
                     <div class="flex justify-between items-center">
@@ -734,7 +1067,6 @@
                     ${(currentViewMode === 'MEDIA' || currentViewMode === 'CUSTOM') ? `<button onclick="openTracker('${req.title.replace(/'/g, "\\'")}')" class="w-full py-1.5 bg-blue-600/10 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-[9px] text-blue-400 uppercase tracking-widest transition-all">Track This Item</button>` : ''}
                   </li>`).join('');
             
-            // ADDED: Attempting Download indicator in Downloader Modal
             const dlData = data.filter(req => !req.title.endsWith('- PERSON'));
             dlList.innerHTML = dlData.map(req => {
                 const isDL = req.dl_status === 'downloading';
